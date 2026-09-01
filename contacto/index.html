@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contacto — Ítaka Deporte y Recreación</title>
+<meta name="description" content="Cuéntanos qué necesitas y te preparamos una propuesta sin compromiso. Respondemos en menos de 24 horas laborables.">
+<link rel="icon" href="../assets/img/icono.png">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/css/itaka.css">
+<script src="../assets/js/itaka.js" defer></script>
+</head>
+<body>
+<header class="cab cab--barra">
+  <div class="cab-caja">
+    <a href="../" class="cab-logo"><img src="../assets/img/logo-blanco.png" alt="Ítaka Deporte y Recreación" /></a>
+    <nav class="cab-nav" id="cab-menu">
+      <a href="../">Inicio</a>
+      <a href="../campamentos/">Campamentos</a>
+      <a href="../servicios/">Servicios</a>
+      <a href="../nosotros/">Nosotros</a>
+      <a href="../contacto/" class="activo">Contacto</a>
+      <a href="../contacto/" class="solo-movil">Pide presupuesto</a>
+    </nav>
+    <a href="../contacto/" class="cab-cta">Pide presupuesto</a>
+    <button class="cab-burger" type="button" aria-label="Abrir el menú" aria-expanded="false" aria-controls="cab-menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<section style="position:relative;background:#0b121b;color:#fff;overflow:hidden;min-height:min(52vh,480px);display:flex;flex-direction:column;justify-content:flex-end">
+  <img src="../assets/img/travesia-salida.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 46%" />
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,18,27,.7) 0%,rgba(11,18,27,.42) 30%,rgba(11,18,27,.84) 100%)"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(115% 76% at 10% 92%,rgba(11,18,27,.88) 0%,rgba(11,18,27,0) 62%)"></div>
+  <div style="position:relative;max-width:1240px;width:100%;margin:0 auto;padding:clamp(70px,11vh,120px) 24px clamp(40px,5vh,56px)">
+    <div style="display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.12);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.24);color:#fff;font-weight:600;font-size:13px;letter-spacing:.06em;padding:7px 16px;border-radius:999px"><span style="width:6px;height:6px;border-radius:50%;background:#0075c4;display:block"></span>Respondemos en 24 h laborables</div>
+    <h1 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:clamp(44px,6.4vw,82px);line-height:.94;letter-spacing:-.025em;margin:22px 0 0;max-width:16ch;text-shadow:0 2px 30px rgba(0,0,0,.4)">Cuéntanos qué necesitas</h1>
+    <p style="font-size:19px;line-height:1.55;color:rgba(255,255,255,.82);max-width:56ch;margin:20px 0 0">Rellena el formulario o llámanos. Te preparamos una propuesta a medida sin compromiso.</p>
+  </div>
+</section>
+
+<section style="max-width:1240px;margin:0 auto;padding:64px 24px 0">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:44px;align-items:start">
+
+    <form id="form-contacto" style="display:flex;flex-direction:column;gap:14px;background:#fff;border:1px solid #e9edf1;border-radius:24px;padding:clamp(24px,3.5vw,38px)">
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Nombre y apellidos
+        <input required="required" placeholder="María García" style="border:1px solid #d8dee4;border-radius:8px;padding:14px 15px;font:500 16px Barlow,sans-serif;color:#14202e" />
+      </label>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px">
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Email
+          <input required="required" type="email" placeholder="maria@email.com" style="border:1px solid #d8dee4;border-radius:8px;padding:14px 15px;font:500 16px Barlow,sans-serif;color:#14202e;width:100%" />
+        </label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Teléfono
+          <input type="tel" placeholder="600 000 000" style="border:1px solid #d8dee4;border-radius:8px;padding:14px 15px;font:500 16px Barlow,sans-serif;color:#14202e;width:100%" />
+        </label>
+      </div>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">¿Qué te interesa?
+        <select style="border:1px solid #d8dee4;border-radius:8px;padding:14px 15px;font:500 16px Barlow,sans-serif;color:#14202e;background:#fff">
+          <option>Campamento de verano</option>
+          <option>Campus de vacaciones</option>
+          <option>Escuela deportiva o extraescolar</option>
+          <option>Fiesta o cumpleaños</option>
+          <option>Evento deportivo / apoyo logístico</option>
+          <option>Alquiler de material</option>
+          <option>Otra cosa</option>
+        </select>
+      </label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Cuéntanos brevemente
+        <textarea rows="5" placeholder="Fechas aproximadas, número de participantes, edades, lugar…" style="border:1px solid #d8dee4;border-radius:8px;padding:14px 15px;font:500 16px/1.5 Barlow,sans-serif;color:#14202e;resize:vertical"></textarea>
+      </label>
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;color:#5b6b7d;font-weight:500">
+        <input required="required" type="checkbox" style="margin-top:3px;width:17px;height:17px;accent-color:#0075c4" />
+        <span>He leído y acepto la política de privacidad. Solo usaremos tus datos para responderte.</span>
+      </label>
+      <button type="submit" style="background:#0b121b;color:#fff;border:0;border-radius:999px;padding:16px;font:700 16px Barlow,sans-serif;cursor:pointer;margin-top:4px" class="hv3">Enviar consulta</button>
+      <p id="form-aviso" style="margin:0;font-size:13.5px;line-height:1.5;color:#8494a4"></p>
+    </form>
+
+    <div style="display:flex;flex-direction:column;gap:26px">
+      <div style="background:#14202e;color:#fff;border-radius:16px;padding:32px">
+        <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:28px;margin:0 0 18px">Contacto directo</h2>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7d93ab;margin-bottom:3px">Teléfono</div>
+            <a href="tel:+34698979952" style="color:#fff;font-size:19px;font-weight:700">698 979 952</a>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7d93ab;margin-bottom:3px">Campamentos</div>
+            <a href="tel:+34604935985" style="color:#fff;font-size:19px;font-weight:700">604 93 59 85</a>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7d93ab;margin-bottom:3px">Email</div>
+            <a href="mailto:itakadyr@gmail.com" style="color:#fff;font-size:19px;font-weight:700">itakadyr@gmail.com</a>
+          </div>
+        </div>
+        <a href="https://wa.me/34698979952" style="display:inline-block;margin-top:24px;background:#0075c4;color:#fff;font-weight:700;font-size:15px;padding:13px 26px;border-radius:999px" class="hv3">Escribir por WhatsApp</a>
+      </div>
+
+      <div style="border:1px solid #e9edf1;border-radius:24px;background:#fff;padding:28px">
+        <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:25px;margin:0 0 14px">Horario de atención</h2>
+        <div style="display:flex;justify-content:space-between;font-size:15.5px;padding:8px 0;border-bottom:1px solid #f0f3f5"><span style="color:#5b6b7d">Lunes a viernes</span><span style="font-weight:700">9:00 – 14:00 · 16:00 – 20:00</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:15.5px;padding:8px 0"><span style="color:#5b6b7d">Sábados</span><span style="font-weight:700">Solo actividades</span></div>
+      </div>
+
+      <div style="border:1px solid #e9edf1;border-radius:24px;background:#fff;overflow:hidden;box-shadow:0 1px 2px rgba(11,18,27,.04),0 18px 40px -20px rgba(11,18,27,.22)">
+        <div style="aspect-ratio:16/9;background:#eef1f4;display:flex;align-items:center;justify-content:center;font:600 11px/1 ui-monospace,Menlo,monospace;letter-spacing:.1em;color:#93a3b3;text-align:center;padding:20px">MAPA / FOTO OFICINA<br />1200×675</div>
+        <div style="padding:22px">
+          <div style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8494a4;margin-bottom:5px">Dónde estamos</div>
+          <p style="margin:0;font-size:16px;line-height:1.5">Alicante, Comunidad Valenciana<br /><span style="color:#7a8a9b;font-size:14.5px">Trabajamos en toda la provincia y el territorio nacional.</span></p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer style="margin-top:86px;background:#14202e;color:#8fa3ba;font-size:14px">
+  <div style="max-width:1180px;margin:0 auto;padding:52px 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:36px">
+    <div>
+      <img src="../assets/img/logo-blanco.png" alt="Ítaka Deporte y Recreación" style="height:44px;width:auto;display:block" />
+      <p style="margin:14px 0 0;line-height:1.55">Alicante, España</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <div style="color:#fff;font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase">Servicios</div>
+      <a href="../campamentos/" style="color:#8fa3ba">Campamentos</a>
+      <a href="../servicios/" style="color:#8fa3ba">Escuelas deportivas</a>
+      <a href="../servicios/" style="color:#8fa3ba">Fiestas y cumpleaños</a>
+      <a href="../servicios/" style="color:#8fa3ba">Eventos deportivos</a>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <div style="color:#fff;font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase">Ítaka</div>
+      <a href="../" style="color:#8fa3ba">Inicio</a>
+      <a href="../nosotros/" style="color:#8fa3ba">Nosotros</a>
+      <a href="../nosotros/#garantias" style="color:#8fa3ba">Garantías y seguridad</a>
+      <a href="../contacto/" style="color:#8fa3ba">Contacto</a>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <div style="color:#fff;font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase">Contacto</div>
+      <a href="tel:+34698979952" style="color:#8fa3ba">698 979 952</a>
+      <a href="mailto:itakadyr@gmail.com" style="color:#8fa3ba">itakadyr@gmail.com</a>
+    </div>
+  </div>
+  <div style="border-top:1px solid #24354a"><div style="max-width:1180px;margin:0 auto;padding:20px 24px;display:flex;flex-wrap:wrap;gap:18px;font-size:13px"><span>© 2026 Ítaka Deporte y Recreación</span><a href="../legal/#aviso-legal" style="color:#8fa3ba">Aviso legal</a><a href="../legal/#privacidad" style="color:#8fa3ba">Privacidad</a><a href="../legal/#cookies" style="color:#8fa3ba">Cookies</a></div></div>
+</footer>
+</body>
+</html>

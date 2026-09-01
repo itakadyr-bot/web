@@ -1,0 +1,225 @@
+/* ============================================================
+   Ítaka Deporte y Recreación · estilos compartidos
+   ------------------------------------------------------------
+   Los estilos de cada bloque van en línea en el HTML (así vino del
+   diseño y así es fácil tocar una página sin romper otra). Aquí vive
+   solo lo que es de verdad común: la base, la cabecera con su menú
+   móvil y los estados hover (que en línea no se pueden escribir).
+   ============================================================ */
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: Barlow, system-ui, sans-serif;
+  color: #14202e;
+  background: #fbfbfa;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: #0075c4; text-decoration: none; }
+a:hover { color: #00477f; }
+::selection { background: #0075c4; color: #fff; }
+img { max-width: 100%; }
+
+/* ------------------------------------------------------------
+   Cabecera · dos variantes:
+   .cab--flotante  la de la portada, píldoras sueltas sobre el héroe
+   .cab--barra     la del resto, barra oscura pegada arriba
+   ------------------------------------------------------------ */
+.cab--flotante {
+  position: relative;
+  z-index: 20;
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 22px 24px 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.cab--barra {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(11, 18, 27, .92);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
+}
+.cab-caja {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cab-logo { display: block; line-height: 0; }
+.cab-logo img { height: 34px; width: auto; display: block; }
+.cab--flotante .cab-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, .1);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, .2);
+  padding: 9px 18px 9px 12px;
+  border-radius: 999px;
+}
+.cab--flotante .cab-logo img { height: 32px; }
+
+.cab-nav {
+  margin: 0 auto;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 6px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 14.5px;
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 255, 255, .16);
+}
+.cab--flotante .cab-nav {
+  background: rgba(255, 255, 255, .1);
+  border-color: rgba(255, 255, 255, .2);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+.cab-nav a {
+  color: rgba(255, 255, 255, .84);
+  padding: 9px 20px;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: background .18s ease, color .18s ease, transform .12s ease;
+}
+.cab-nav a:hover { background: rgba(255, 255, 255, .15); color: #fff; }
+.cab-nav a:active { transform: scale(.96); }
+.cab-nav a.activo { color: #fff; background: rgba(255, 255, 255, .2); }
+.cab-nav .solo-movil { display: none; }
+
+.cab-cta {
+  background: #fff;
+  color: #0b121b;
+  font-weight: 700;
+  font-size: 14.5px;
+  padding: 13px 24px;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: background .18s ease, color .18s ease, transform .12s ease;
+}
+.cab-cta:hover { background: #0075c4; color: #fff; }
+.cab-cta:active { transform: scale(.96); }
+
+.cab-burger {
+  display: none;
+  margin-left: auto;
+  width: 46px;
+  height: 46px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, .1);
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: 999px;
+  cursor: pointer;
+  padding: 0;
+}
+.cab-burger span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transition: transform .2s ease, opacity .2s ease;
+}
+.cab.abierta .cab-burger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.cab.abierta .cab-burger span:nth-child(2) { opacity: 0; }
+.cab.abierta .cab-burger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+@media (max-width: 920px) {
+  .cab-cta { display: none; }
+  .cab-burger { display: flex; }
+
+  /* El panel del menú vive siempre en el DOM: así la entrada y la
+     salida recorren el mismo camino, anclado al botón que lo abre
+     (arriba a la derecha), en vez de aparecer y desaparecer a saco.
+     El selector doble es a propósito: si no, en la portada ganaría
+     el fondo claro de `.cab--flotante .cab-nav` y el panel no se lee. */
+  .cab--flotante .cab-nav, .cab--barra .cab-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    position: fixed;
+    top: 84px;
+    left: 14px;
+    right: 14px;
+    margin: 0;
+    padding: 10px;
+    border-radius: 22px;
+    background: rgba(11, 18, 27, .96);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, .18);
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .6);
+    z-index: 100;
+    transform-origin: top right;
+    opacity: 0;
+    transform: scale(.96) translateY(-10px);
+    pointer-events: none;
+    transition: opacity .2s ease, transform .24s cubic-bezier(.2, .9, .3, 1);
+  }
+  .cab.abierta .cab-nav {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+  .cab-nav a {
+    font-size: 17px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    white-space: normal;
+  }
+  .cab-nav .solo-movil {
+    display: block;
+    margin-top: 6px;
+    background: #fff;
+    color: #0b121b;
+    font-weight: 700;
+    text-align: center;
+  }
+  .cab-nav .solo-movil:hover { background: #0075c4; color: #fff; }
+}
+
+/* Quien pide menos movimiento, lo tiene: fundidos cortos y ya. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+  .cab-nav { transform: none; }
+}
+
+/* ------------------------------------------------------------
+   Estados hover de los bloques con estilos en línea.
+   `!important` porque un estilo en línea siempre gana a una clase:
+   sin él, el hover no se vería nunca.
+   ------------------------------------------------------------ */
+.hv1:hover{background:rgba(255,255,255,.16) !important;color:#fff !important}
+.hv2:hover{background:#0b121b !important;color:#fff !important}
+.hv3:hover{background:#0075c4 !important}
+.hv4:hover{background:rgba(255,255,255,.2) !important}
+.hv5:hover{background:rgba(255,255,255,.24) !important}
+.hv6:hover{border-color:#8aa8c2 !important}
+.hv7:hover{transform:translateY(-4px) !important;box-shadow:0 1px 2px rgba(11,18,27,.05),0 26px 52px -22px rgba(11,18,27,.3) !important}
+.hv8:hover{background:rgba(255,255,255,.1) !important}
+.hv9:hover{background:rgba(255,255,255,.14) !important;color:#fff !important}
+.hv10:hover{background:#14202e !important;color:#fff !important}
+.hv11:hover{background:rgba(255,255,255,.15) !important}
+.hv12:hover{border-color:#8aa8c2 !important;color:#0075c4 !important}
+.hv13:hover{border-color:#0075c4 !important;color:#0075c4 !important}
