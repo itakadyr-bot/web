@@ -216,6 +216,13 @@ create policy "admin gestiona reservas" on public.reservas
 for all to authenticated using (public.es_admin()) with check (public.es_admin());
 ```
 
+La ficha de inscripción completa (talla, alergias, autorizaciones…) se guarda
+en una columna aparte. Si la tabla ya existía de antes, hay que añadirla:
+
+```sql
+alter table public.reservas add column if not exists datos jsonb;
+```
+
 Para CERRAR las reservas de un campamento (o de todos), sin tocar nada más:
 
 ```sql

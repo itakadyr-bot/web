@@ -114,6 +114,23 @@ Deno.serve(async (peticion) => {
   // El aviso al correo del club (una sola vez por reserva).
   if (RESEND_KEY && !reserva.aviso_enviado) {
     const nombreCamp = limpio(reserva.campamento_id);
+
+    // La ficha completa de inscripción, con nombres en cristiano.
+    const ETIQUETAS: Record<string, string> = {
+      dni: "DNI del alumno/a", sip: "SIP", sexo: "Sexo",
+      anyo_nacimiento: "Año de nacimiento", talla: "Talla de camiseta",
+      hermano: "¿Viene su hermano/a también?", primera_vez: "¿Primera experiencia?",
+      tutor_dni: "DNI del tutor/a", direccion: "Dirección",
+      como_nos_conocio: "¿Cómo nos conoció?", grupo_nuevos: "¿Grupo de 3+ nuevos?",
+      alergias: "Alergias / intolerancias", autoriza_info: "Autoriza envío de información",
+      autoriza_fotos: "Autoriza fotos y vídeos", observaciones: "Observaciones",
+    };
+    const ficha = (reserva.datos ?? {}) as Record<string, string>;
+    const filasFicha = Object.keys(ETIQUETAS)
+      .filter((k) => ficha[k])
+      .map((k) => `<b>${ETIQUETAS[k]}:</b> ${limpio(ficha[k])}`)
+      .join("<br>\n         ");
+
     const html = `
       <h2 style="margin:0 0 12px">💶 Señal pagada · reserva de campamento</h2>
       <p><b>Campamento:</b> ${nombreCamp}<br>
@@ -122,7 +139,9 @@ Deno.serve(async (peticion) => {
          <b>Correo:</b> ${limpio(reserva.email)}<br>
          <b>Teléfono:</b> ${limpio(reserva.telefono) || "—"}<br>
          <b>Señal cobrada:</b> ${(reserva.importe_centimos / 100).toFixed(2)} €</p>
-      <p style="color:#888">Reserva ${limpio(reserva.id)} · para responder, escribe a ${limpio(reserva.email)}.</p>`;
+      ${filasFicha ? `<h3 style="margin:16px 0 8px">Ficha de inscripción</h3><p>${filasFicha}</p>` : ""}
+      <p style="color:#888">Recuerda enviarle a la familia las instrucciones del resto del pago.
+      Reserva ${limpio(reserva.id)} · para responder, escribe a ${limpio(reserva.email)}.</p>`;
     const envio = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${RESEND_KEY}`, "Content-Type": "application/json" },

@@ -83,11 +83,26 @@ Deno.serve(async (peticion) => {
   try { datos = await peticion.json(); } catch (_e) { /* cuerpo roto */ }
 
   const campamentoId = texto(datos.campamento, 40);
-  const participante = texto(datos.participante, 120);
+  const participante = texto(datos.participante, 160);
   const nacimiento = texto(datos.nacimiento, 20);
   const tutor = texto(datos.tutor, 120);
   const email = texto(datos.email, 200);
   const telefono = texto(datos.telefono, 40);
+
+  // El resto de la ficha de inscripción viaja en `datos.datos` y se
+  // guarda tal cual (limpio y recortado) en la columna jsonb.
+  const CLAVES_FICHA = [
+    "dni", "sip", "sexo", "anyo_nacimiento", "talla", "hermano",
+    "primera_vez", "tutor_dni", "direccion", "como_nos_conocio",
+    "grupo_nuevos", "alergias", "autoriza_info", "autoriza_fotos",
+    "observaciones",
+  ];
+  const ficha: Record<string, string> = {};
+  const crudo = (datos.datos ?? {}) as Record<string, unknown>;
+  for (const clave of CLAVES_FICHA) {
+    const valor = texto(crudo[clave], 600);
+    if (valor) ficha[clave] = valor;
+  }
 
   if (!campamentoId || !participante || !tutor || !email.includes("@")) {
     return respuesta({ error: "faltan_datos", mensaje: "Revisa el nombre, el tutor y el correo." }, 400);
@@ -111,6 +126,7 @@ Deno.serve(async (peticion) => {
     body: JSON.stringify({
       campamento_id: camp.id,
       participante, nacimiento, tutor, email, telefono,
+      datos: ficha,
       estado: "pendiente",
       importe_centimos: camp.senal_centimos,
     }),

@@ -36,9 +36,9 @@
       if (vuelta === 'ok') {
         caja.style.background = '#eef8ee';
         caja.style.borderColor = '#bfe3bf';
-        caja.innerHTML = '<strong>¡Plaza reservada!</strong> Hemos recibido tu señal. ' +
-          'Te llegará el recibo de la pasarela de pago al correo, y nosotros nos ' +
-          'pondremos en contacto contigo con los siguientes pasos.';
+        caja.innerHTML = '<strong>¡Plaza reservada!</strong> Hemos recibido tu señal y ' +
+          'la ficha de inscripción. En 24-48 horas laborables te enviaremos un correo ' +
+          'con las instrucciones para el resto del pago.';
       } else {
         /* Ámbar, no rojo: un pago que se queda a medias no es una
            emergencia. Y lo primero, quitar el miedo. */
@@ -86,11 +86,32 @@
       },
       body: JSON.stringify({
         campamento: campamento,
-        participante: (datos.get('participante') || '').trim(),
-        nacimiento: (datos.get('nacimiento') || '').trim(),
+        /* el nombre completo se compone de las tres casillas */
+        participante: [datos.get('nombre'), datos.get('apellido1'), datos.get('apellido2')]
+          .map(function (t) { return (t || '').trim(); })
+          .filter(Boolean).join(' '),
+        nacimiento: (datos.get('anyo_nacimiento') || '').trim(),
         tutor: (datos.get('tutor') || '').trim(),
         email: (datos.get('email') || '').trim(),
-        telefono: (datos.get('telefono') || '').trim()
+        telefono: (datos.get('telefono') || '').trim(),
+        /* el resto de la ficha viaja junto y se guarda tal cual */
+        datos: {
+          dni: (datos.get('dni') || '').trim(),
+          sip: (datos.get('sip') || '').trim(),
+          sexo: datos.get('sexo') || '',
+          anyo_nacimiento: (datos.get('anyo_nacimiento') || '').trim(),
+          talla: datos.get('talla') || '',
+          hermano: datos.get('hermano') || '',
+          primera_vez: datos.get('primera_vez') || '',
+          grupo_nuevos: datos.get('grupo_nuevos') || '',
+          tutor_dni: (datos.get('tutor_dni') || '').trim(),
+          direccion: (datos.get('direccion') || '').trim(),
+          como_nos_conocio: datos.get('como_nos_conocio') || '',
+          alergias: (datos.get('alergias') || '').trim(),
+          autoriza_info: datos.get('autoriza_info') || '',
+          autoriza_fotos: datos.get('autoriza_fotos') || '',
+          observaciones: (datos.get('observaciones') || '').trim()
+        }
       })
     }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (r) {
