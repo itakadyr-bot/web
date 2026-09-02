@@ -164,7 +164,81 @@ solo falta el aviso al correo.
 
 ---
 
-## 7. Pendiente para la fase de pagos (todavía NO)
+## 7. Reservas de campamento (tablas para la fase de pagos)
 
-Las tablas de campamentos y reservas, y las funciones de Stripe, llegarán
-cuando esté la cuenta de Stripe. Se añadirán aquí como paso 7 y 8.
+El catálogo de campamentos (con la señal que se cobra: la lee el SERVIDOR,
+nunca el navegador) y las reservas. Las reservas NO pueden crearse ni leerse
+desde el navegador: solo las funciones (con la llave de servicio) y
+administración.
+
+```sql
+create table if not exists public.campamentos (
+  id text primary key,
+  nombre text not null,
+  senal_centimos integer not null check (senal_centimos > 0),
+  activo boolean not null default true,
+  created_at timestamptz default now()
+);
+alter table public.campamentos enable row level security;
+
+drop policy if exists "cualquiera lee campamentos" on public.campamentos;
+create policy "cualquiera lee campamentos" on public.campamentos
+for select to anon, authenticated using (true);
+
+drop policy if exists "admin gestiona campamentos" on public.campamentos;
+create policy "admin gestiona campamentos" on public.campamentos
+for all to authenticated using (public.es_admin()) with check (public.es_admin());
+
+insert into public.campamentos (id, nombre, senal_centimos) values
+  ('riopar',     'San Juan de Riópar',  15000),
+  ('palancares', 'Palancares',          15000),
+  ('alcossebre', 'Alcossebre · Jaime I', 15000)
+on conflict (id) do nothing;
+
+create table if not exists public.reservas (
+  id uuid primary key default gen_random_uuid(),
+  campamento_id text not null references public.campamentos(id),
+  participante text not null,
+  nacimiento text,
+  tutor text not null,
+  email text not null,
+  telefono text,
+  estado text not null default 'pendiente',
+  importe_centimos integer not null,
+  stripe_session_id text,
+  aviso_enviado boolean default false,
+  created_at timestamptz default now()
+);
+alter table public.reservas enable row level security;
+
+drop policy if exists "admin gestiona reservas" on public.reservas;
+create policy "admin gestiona reservas" on public.reservas
+for all to authenticated using (public.es_admin()) with check (public.es_admin());
+```
+
+Para CERRAR las reservas de un campamento (o de todos), sin tocar nada más:
+
+```sql
+update public.campamentos set activo = false;              -- todos
+-- update public.campamentos set activo = false where id = 'riopar';
+-- y para abrirlas: set activo = true
+```
+
+## 8. Las funciones de Stripe (cuando esté la clave)
+
+1. Stripe → **Developers → API keys** → copia la **Secret key** de PRUEBA
+   (`sk_test_…`) → pégala en Supabase → Edge Functions → **Secrets** como
+   `STRIPE_SECRET_KEY`.
+2. Despliega por el editor (como `correo-avisar`) estas dos funciones del
+   repositorio:
+   - `reserva-crear` (verificación JWT normal, como viene)
+   - `pago-webhook` — ⚠️ en su configuración hay que **desactivar
+     «Verify JWT»**: a esta función la llama Stripe, no el navegador.
+3. Stripe → **Developers → Webhooks → Add endpoint**:
+   - URL: `https://oopyndrewijbqcryfbuj.supabase.co/functions/v1/pago-webhook`
+   - Evento: `checkout.session.completed`
+   - Crea el endpoint y copia su **Signing secret** (`whsec_…`) → Supabase →
+     Edge Functions → Secrets como `STRIPE_WEBHOOK_SECRET`.
+4. Para probar sin cobrar nada: tarjeta `4242 4242 4242 4242`, cualquier
+   fecha futura y cualquier CVC. Cuando todo esté visto, se cambia la clave
+   de prueba por la real (`sk_live_…`) y el webhook se recrea en modo real.

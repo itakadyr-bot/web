@@ -73,7 +73,7 @@
       <p style="font-size:17px;line-height:1.6;color:#4a5a6c;margin:0 0 14px" data-edit="naturaleza-de-verdad-sin-pantallas-y-con-mon-e491">Naturaleza de verdad, sin pantallas y con monitores titulados las 24 horas. Los grupos se organizan por edades y cada día combina actividad, descanso y tiempo libre vigilado.</p>
       <p style="font-size:17px;line-height:1.6;color:#4a5a6c;margin:0 0 26px" data-edit="asociacion-de-tiempo-libre-monte-tossal-con-e244">Asociación de Tiempo Libre Monte Tossal, con la gestión de Ítaka Deporte y Recreación. Aplicamos los protocolos LOPIVI: certificado de delitos sexuales verificado para todo el personal, delegado de protección y seguro de responsabilidad civil y accidentes.</p>
       <div style="display:flex;gap:12px;flex-wrap:wrap">
-        <a href="../../contacto/" style="background:#31404f;color:#fff;font-weight:700;font-size:16px;padding:16px 30px;border-radius:999px;box-shadow:0 10px 30px -8px rgba(11,18,27,.35)" class="hv3" data-edit="apuntate-a-la-lista-64c3">Apúntate a la lista</a>
+        <a href="#reservar" style="background:#0075c4;color:#fff;font-weight:700;font-size:16px;padding:16px 30px;border-radius:999px;box-shadow:0 10px 30px -8px rgba(0,60,100,.4)" class="hv14" data-edit="apuntate-a-la-lista-64c3">Reservar plaza · señal 150 €</a>
         <a href="https://wa.me/34698979952?text=Hola%2C%20quiero%20informaci%C3%B3n%20del%20campamento%20de%20Riópar" style="border:1.5px solid #d8dee4;color:#14202e;font-weight:700;font-size:16px;padding:16px 30px;border-radius:999px" class="hv13" data-edit="preguntar-por-whatsapp-63dc">Preguntar por WhatsApp</a>
       </div>
     </div>
@@ -137,6 +137,50 @@
   </div>
 </section>
 
+
+<section id="reservar" style="max-width:1180px;margin:0 auto;padding:70px 24px 0;width:100%;scroll-margin-top:90px">
+  <div style="background:#fff;border:1px solid #e9edf1;border-radius:24px;padding:clamp(26px,3.5vw,38px);box-shadow:0 1px 2px rgba(11,18,27,.04),0 18px 40px -20px rgba(11,18,27,.22)">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:34px;align-items:start">
+      <div>
+        <div style="font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#0075c4">Reserva de plaza</div>
+        <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(30px,4vw,44px);line-height:1;letter-spacing:-.015em;margin:10px 0 14px">Reserva con una señal de 150 €</h2>
+        <p style="font-size:16px;line-height:1.6;color:#4a5a6c;margin:0 0 10px">La señal aparta la plaza y <strong>se descuenta del precio total</strong>. El pago se hace en la página segura de Stripe: los datos de la tarjeta nunca pasan por nuestra web.</p>
+        <p style="font-size:16px;line-height:1.6;color:#4a5a6c;margin:0 0 10px">Después del pago nos pondremos en contacto contigo para el resto de la inscripción (ficha, salud y autorizaciones) y las formas de pagar lo restante.</p>
+        <p style="font-size:14px;line-height:1.55;color:#8494a4;margin:0">Si el pago falla o lo dejas a medias, no se cobra nada y puedes volver a intentarlo.</p>
+      </div>
+      <div>
+        <div id="reserva-vuelta" hidden style="border:1px solid;border-radius:14px;padding:16px 18px;font-size:15px;line-height:1.55;margin-bottom:16px"></div>
+        <div id="reserva-cerrado" hidden style="border:1px dashed #b9c4ce;background:#f5f7f9;border-radius:14px;padding:18px 20px;font-size:15px;line-height:1.6;color:#4a5a6c">Las reservas de este campamento están <strong>cerradas</strong> ahora mismo. <a href="../../contacto/" style="font-weight:700">Déjanos tu contacto</a> y te avisamos en cuanto se abran las plazas.</div>
+        <form id="form-reserva" data-campamento="riopar" style="display:flex;flex-direction:column;gap:13px">
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Nombre del niño o niña
+            <input name="participante" required placeholder="Nombre y apellidos" style="border:1px solid #d8dee4;border-radius:8px;padding:14px 15px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%">
+          </label>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:13px">
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Fecha de nacimiento
+              <input name="nacimiento" type="date" style="border:1px solid #d8dee4;border-radius:8px;padding:14px 15px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%">
+            </label>
+            <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Teléfono
+              <input name="telefono" type="tel" placeholder="600 000 000" style="border:1px solid #d8dee4;border-radius:8px;padding:14px 15px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%">
+            </label>
+          </div>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Padre, madre o tutor/a
+            <input name="tutor" required placeholder="Nombre y apellidos" style="border:1px solid #d8dee4;border-radius:8px;padding:14px 15px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%">
+          </label>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Correo electrónico
+            <input name="email" type="email" required placeholder="tucorreo@email.com" style="border:1px solid #d8dee4;border-radius:8px;padding:14px 15px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%">
+          </label>
+          <label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;color:#5b6b7d;font-weight:500">
+            <input required type="checkbox" style="margin-top:3px;width:17px;height:17px;accent-color:#0075c4">
+            <span>He leído y acepto la <a href="../../legal/#privacidad">política de privacidad</a>.</span>
+          </label>
+          <button type="submit" style="background:#0075c4;color:#fff;border:0;border-radius:999px;padding:16px;font:700 16px Barlow,sans-serif;cursor:pointer;margin-top:4px" class="hv14">Pagar la señal de 150 € con tarjeta</button>
+          <p id="reserva-aviso" style="margin:0;font-size:13.5px;line-height:1.5;color:#8494a4"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section style="max-width:1180px;margin:70px auto 0;padding:0 24px;width:100%">
   <div style="background:#0b121b;border-radius:28px;padding:clamp(32px,4.6vw,54px);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap;box-shadow:0 30px 70px -34px rgba(11,18,27,.6)">
     <div>
@@ -144,7 +188,7 @@
       <p style="font-size:16px;line-height:1.55;margin:10px 0 0;color:#c3d0de" data-edit="dejanos-tu-contacto-y-te-avisamos-en-cuanto-1bc3">Déjanos tu contacto y te avisamos en cuanto se abran · 604 93 59 85 · itakadyr@gmail.com</p>
     </div>
     <div style="display:flex;gap:12px;flex-wrap:wrap">
-      <a href="../../contacto/" style="background:#fff;color:#0b121b;font-weight:700;font-size:16px;padding:16px 30px;border-radius:999px" class="hv15" data-edit="apuntate-a-la-lista-64c3-2">Apúntate a la lista</a>
+      <a href="#reservar" style="background:#fff;color:#0b121b;font-weight:700;font-size:16px;padding:16px 30px;border-radius:999px" class="hv15" data-edit="apuntate-a-la-lista-64c3-2">Reservar plaza</a>
       <a href="https://wa.me/34698979952?text=Hola%2C%20quiero%20informaci%C3%B3n%20del%20campamento%20de%20Riópar" style="border:1.5px solid rgba(255,255,255,.45);color:#fff;font-weight:700;font-size:16px;padding:16px 30px;border-radius:999px" class="hv8" data-edit="preguntar-por-whatsapp-63dc-2">Preguntar por WhatsApp</a>
     </div>
   </div>
@@ -180,6 +224,7 @@
   </div>
   <div style="border-top:1px solid #24354a"><div style="max-width:1180px;margin:0 auto;padding:20px 24px;display:flex;flex-wrap:wrap;gap:18px;font-size:13px"><span data-edit="2026-itaka-deporte-y-recreacion-e9a4">© 2026 Ítaka Deporte y Recreación</span><a href="../../legal/#aviso-legal" style="color:#8fa3ba" data-edit="aviso-legal-236a">Aviso legal</a><a href="../../legal/#privacidad" style="color:#8fa3ba" data-edit="privacidad-965c">Privacidad</a><a href="../../legal/#cookies" style="color:#8fa3ba" data-edit="cookies-597b">Cookies</a></div></div>
 </footer>
+<script src="../../assets/js/reservas.js" defer></script>
 <script src="../../assets/js/contenido.js"></script>
 </body>
 </html>
