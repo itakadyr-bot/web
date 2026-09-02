@@ -27,7 +27,8 @@
 
   /* Qué página es esta, por la ruta. Sirve igual en local, en
      GitHub Pages (/web/campamentos/) y en itakadyr.com. */
-  var CONOCIDAS = ['campamentos', 'campus', 'servicios', 'nosotros', 'contacto', 'legal', 'acceso'];
+  var CONOCIDAS = ['campamentos', 'riopar', 'palancares', 'alcossebre',
+                   'campus', 'servicios', 'nosotros', 'contacto', 'legal', 'acceso'];
   var pagina = 'inicio';
   location.pathname.split('/').forEach(function (trozo) {
     if (CONOCIDAS.indexOf(trozo) >= 0) pagina = trozo;
