@@ -41,7 +41,7 @@ img { max-width: 100%; }
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(45, 55, 66, .92);
+  background: rgba(11, 18, 27, .92);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(255, 255, 255, .1);
@@ -102,7 +102,7 @@ img { max-width: 100%; }
 
 .cab-cta {
   background: #fff;
-  color: #414e5c;
+  color: #0b121b;
   font-weight: 700;
   font-size: 14.5px;
   padding: 13px 24px;
@@ -161,7 +161,7 @@ img { max-width: 100%; }
     margin: 0;
     padding: 10px;
     border-radius: 22px;
-    background: rgba(45, 55, 66, .96);
+    background: rgba(11, 18, 27, .96);
     -webkit-backdrop-filter: blur(20px) saturate(160%);
     backdrop-filter: blur(20px) saturate(160%);
     border: 1px solid rgba(255, 255, 255, .18);
@@ -188,7 +188,7 @@ img { max-width: 100%; }
     display: block;
     margin-top: 6px;
     background: #fff;
-    color: #414e5c;
+    color: #0b121b;
     font-weight: 700;
     text-align: center;
   }
@@ -211,15 +211,15 @@ img { max-width: 100%; }
    sin él, el hover no se vería nunca.
    ------------------------------------------------------------ */
 .hv1:hover{background:rgba(255,255,255,.16) !important;color:#fff !important}
-.hv2:hover{background:#414e5c !important;color:#fff !important}
+.hv2:hover{background:#0b121b !important;color:#fff !important}
 .hv3:hover{background:#0075c4 !important}
 .hv4:hover{background:rgba(255,255,255,.2) !important}
 .hv5:hover{background:rgba(255,255,255,.24) !important}
 .hv6:hover{border-color:#8aa8c2 !important}
-.hv7:hover{transform:translateY(-4px) !important;box-shadow:0 1px 2px rgba(45,55,66,.05),0 26px 52px -22px rgba(45,55,66,.3) !important}
+.hv7:hover{transform:translateY(-4px) !important;box-shadow:0 1px 2px rgba(11,18,27,.05),0 26px 52px -22px rgba(11,18,27,.3) !important}
 .hv8:hover{background:rgba(255,255,255,.1) !important}
 .hv9:hover{background:rgba(255,255,255,.14) !important;color:#fff !important}
-.hv10:hover{background:#3d4956 !important;color:#fff !important}
+.hv10:hover{background:#14202e !important;color:#fff !important}
 .hv11:hover{background:rgba(255,255,255,.15) !important}
 .hv12:hover{border-color:#8aa8c2 !important;color:#0075c4 !important}
 .hv13:hover{border-color:#0075c4 !important;color:#0075c4 !important}
@@ -250,7 +250,7 @@ img { max-width: 100%; }
   gap: 2px;
   padding: 8px;
   border-radius: 18px;
-  background: rgba(45, 55, 66, .97);
+  background: rgba(11, 18, 27, .97);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
   backdrop-filter: blur(20px) saturate(160%);
   border: 1px solid rgba(255, 255, 255, .18);
@@ -308,4 +308,19 @@ img { max-width: 100%; }
     padding: 8px 14px;
     color: rgba(255, 255, 255, .68);
   }
+}
+
+/* ------------------------------------------------------------
+   Toque «liquid glass»: un filo de luz en el borde superior y una
+   sombra sutil en el inferior de todo lo translúcido, como luz
+   cayendo sobre el cristal. Solo en lo que YA es cristal (cabecera,
+   píldoras sobre foto, desplegables): sobre fondo blanco liso el
+   cristal no tiene nada que desenfocar y quedaría lavado.
+   ------------------------------------------------------------ */
+.cab--flotante .cab-logo,
+.cab-nav,
+.cab-burger,
+.cab-sub,
+[style*="backdrop-filter:blur"]:not(img) {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .28), inset 0 -1px 0 rgba(0, 0, 0, .14);
 }

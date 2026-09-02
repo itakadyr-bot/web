@@ -62,10 +62,10 @@
     var css = document.createElement('style');
     css.textContent =
       '.fantasma-barra{position:fixed;right:16px;bottom:16px;z-index:9999;display:flex;gap:8px;align-items:center;' +
-      'background:rgba(45,55,66,.95);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.2);' +
+      'background:rgba(11,18,27,.95);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.2);' +
       'border-radius:999px;padding:8px;box-shadow:0 20px 50px -12px rgba(0,0,0,.5);font:600 14px Barlow,system-ui,sans-serif}' +
       '.fantasma-barra button{border:0;border-radius:999px;padding:10px 18px;font:inherit;cursor:pointer;' +
-      'background:#fff;color:#414e5c;transition:background .18s ease,color .18s ease,transform .12s ease}' +
+      'background:#fff;color:#0b121b;transition:background .18s ease,color .18s ease,transform .12s ease}' +
       '.fantasma-barra button:hover{background:#0075c4;color:#fff}' +
       '.fantasma-barra button:active{transform:scale(.96)}' +
       '.fantasma-barra .secundario{background:rgba(255,255,255,.12);color:#fff}' +
