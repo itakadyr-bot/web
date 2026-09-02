@@ -73,7 +73,11 @@
       'body.editando [data-edit]{outline:1.5px dashed rgba(0,117,196,.6);outline-offset:2px;cursor:text}' +
       'body.editando [data-edit]:hover{background:rgba(0,117,196,.08)}' +
       'body.editando [data-edit]:focus{outline:2px solid #0075c4;background:rgba(0,117,196,.06)}' +
-      'body.editando [data-edit-img]{outline:2px dashed rgba(0,117,196,.8);outline-offset:-2px;cursor:grab;touch-action:none;-webkit-user-drag:none}';
+      'body.editando [data-edit-img]{outline:2px dashed rgba(0,117,196,.8);outline-offset:-2px;cursor:grab;touch-action:none;-webkit-user-drag:none}' +
+      /* Los sombreados que van encima de las fotos de los héroes se
+         comían el clic: en modo edición los clics los atraviesan,
+         para poder tocar la foto de debajo. */
+      'body.editando [style*="position:absolute"][style*="gradient"]{pointer-events:none}';
     document.head.appendChild(css);
 
     barra = document.createElement('div');
