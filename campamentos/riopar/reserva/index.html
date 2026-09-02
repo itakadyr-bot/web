@@ -98,6 +98,18 @@
         </div>
       </div>
 
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;margin:26px 0 4px;line-height:1">La señal de 150 €</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:13px">
+        <label style="display:flex;gap:12px;align-items:flex-start;border:1px solid #d8dee4;border-radius:14px;padding:14px 16px;cursor:pointer">
+          <input type="radio" name="pago" value="tarjeta" checked style="margin-top:3px;accent-color:#0075c4">
+          <span style="font-size:14.5px;line-height:1.5;color:#2f3d4a"><strong>Con tarjeta, ahora</strong><br><span style="color:#5b6b7d" data-edit="pago-tarjeta-nota">Pago seguro en Stripe. La plaza queda apartada al momento.</span></span>
+        </label>
+        <label style="display:flex;gap:12px;align-items:flex-start;border:1px solid #d8dee4;border-radius:14px;padding:14px 16px;cursor:pointer">
+          <input type="radio" name="pago" value="efectivo" style="margin-top:3px;accent-color:#0075c4">
+          <span style="font-size:14.5px;line-height:1.5;color:#2f3d4a"><strong>En efectivo, en persona</strong><br><span style="color:#5b6b7d" data-edit="pago-efectivo-nota">Quedamos para cobrarla. La plaza NO queda confirmada hasta ese pago.</span></span>
+        </label>
+      </div>
+
       <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;margin:26px 0 4px;line-height:1">Condiciones</h3>
       <p style="margin:0 0 8px;font-size:13px;line-height:1.55;color:#5b6b7d;max-height:120px;overflow-y:auto;border:1px solid #eef1f4;border-radius:10px;padding:10px 12px;background:#fafbfc" data-edit="reserva-cond-reserva">El pago de la señal de 150 € reserva la plaza. Te enviaremos un correo con las instrucciones para completar el pago del resto por transferencia bancaria, completo o fraccionado. La señal se descuenta del precio total del campamento.</p>
       <label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;color:#5b6b7d;font-weight:500"><input required type="checkbox" name="acepta_reserva" style="margin-top:3px;width:17px;height:17px;accent-color:#0075c4"><span>Acepto las condiciones de reserva de plaza.</span></label>

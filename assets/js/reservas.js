@@ -70,12 +70,23 @@
     })
     .catch(function () { /* si la base no contesta, el formulario sigue */ });
 
-  /* --- Enviar: a por la pasarela ------------------------------- */
+  /* --- El botón dice lo que va a pasar según el modo de pago --- */
+  var textoTarjeta = boton.textContent;
+  form.addEventListener('change', function (e) {
+    if (e.target && e.target.name === 'pago') {
+      boton.textContent = e.target.value === 'efectivo'
+        ? 'Enviar la inscripción (señal en efectivo)'
+        : textoTarjeta;
+    }
+  });
+
+  /* --- Enviar: a por la pasarela (o inscripción en efectivo) --- */
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var datos = new FormData(form);
+    var enEfectivo = datos.get('pago') === 'efectivo';
     boton.disabled = true;
-    di('Abriendo el pago seguro…');
+    di(enEfectivo ? 'Enviando la inscripción…' : 'Abriendo el pago seguro…');
 
     fetch(window.ITAKA.URL + '/functions/v1/reserva-crear', {
       method: 'POST',
@@ -86,6 +97,7 @@
       },
       body: JSON.stringify({
         campamento: campamento,
+        pago: enEfectivo ? 'efectivo' : 'tarjeta',
         /* el nombre completo se compone de las tres casillas */
         participante: [datos.get('nombre'), datos.get('apellido1'), datos.get('apellido2')]
           .map(function (t) { return (t || '').trim(); })
@@ -118,6 +130,24 @@
         if (r.ok && r.d.url) {
           di('Llevándote a la página segura de pago…');
           location.href = r.d.url;
+          return;
+        }
+        /* Inscripción con señal en efectivo: no hay pasarela. Queda
+           apuntada y se le dice a la familia, con letras claras, que
+           la plaza no está confirmada hasta pagar. */
+        if (r.ok && r.d.efectivo) {
+          var caja = document.getElementById('reserva-vuelta');
+          if (caja) {
+            caja.hidden = false;
+            caja.style.background = '#fdf6e7';
+            caja.style.borderColor = '#ecd9a8';
+            caja.innerHTML = '<strong>Hemos recibido tu inscripción.</strong> Te contactaremos ' +
+              'muy pronto para quedar y cobrar la señal de 150 € en efectivo. ' +
+              '<strong>Ojo: la plaza no queda confirmada hasta ese pago.</strong> ' +
+              'Si lo prefieres, llámanos al 604 93 59 85 y lo cerramos antes.';
+            caja.scrollIntoView({ block: 'center' });
+          }
+          form.hidden = true;
           return;
         }
         boton.disabled = false;
