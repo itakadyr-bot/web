@@ -145,8 +145,9 @@
         if (!fotos[hueco]) fotos[hueco] = { urlAntes: el.src };
         if (!('posAntes' in fotos[hueco])) {
           fotos[hueco].posAntes = arrastre.px + '% ' + arrastre.py + '%';
+          fotos[hueco].zoomAntes = zoomDe(el);
         }
-        fotos[hueco].posicion = el.style.objectPosition;
+        fotos[hueco].posicion = encuadreDe(el);
         aviso.textContent = 'Encuadre listo; se publica al guardar';
         /* Que el clic que llega justo después no abra el selector. */
         arrastreReciente = true;
@@ -154,10 +155,58 @@
       }
       arrastre = null;
     });
+
+    /* ------------------------------------------------------------
+       AMPLIAR UNA FOTO: la rueda del ratón (o dos dedos en el
+       trackpad) sobre la foto acerca o aleja, de ×1 a ×3. Se apoya
+       en object-view-box: un navegador viejo que no lo entienda
+       simplemente no amplía, y el resto del encuadre sigue igual.
+       ------------------------------------------------------------ */
+    document.addEventListener('wheel', function (e) {
+      if (!editando) return;
+      var img = e.target.closest && e.target.closest('[data-edit-img]');
+      if (!img) return;
+      e.preventDefault();
+      var hueco = img.getAttribute('data-edit-img');
+      if (!fotos[hueco]) fotos[hueco] = { urlAntes: img.src };
+      var foto = fotos[hueco];
+      if (!('posAntes' in foto)) {
+        foto.posAntes = getComputedStyle(img).objectPosition;
+        foto.zoomAntes = zoomDe(img);
+      }
+      var z = zoomDe(img) * (e.deltaY < 0 ? 1.06 : 1 / 1.06);
+      z = Math.max(1, Math.min(3, z));
+      aplicaZoom(img, z);
+      foto.posicion = encuadreDe(img);
+      aviso.textContent = z > 1.001
+        ? 'Zoom ×' + z.toFixed(1) + '; se publica al guardar'
+        : 'Sin zoom; se publica al guardar';
+    }, { passive: false });
   }
 
   var arrastre = null;
   var arrastreReciente = false;
+
+  /* El zoom guardado vive en object-view-box como inset(p%):
+     p = 50·(1−1/z), así que z = 50/(50−p). */
+  function zoomDe(img) {
+    var m = /inset\(([\d.]+)%\)/.exec(img.style.objectViewBox || '');
+    return m ? 50 / (50 - parseFloat(m[1])) : 1;
+  }
+
+  function aplicaZoom(img, z) {
+    img.style.objectViewBox = z > 1.001
+      ? 'inset(' + (50 * (1 - 1 / z)).toFixed(2) + '%)'
+      : '';
+  }
+
+  /* El encuadre completo tal y como se guarda: «x% y%» o «x% y% 1.4». */
+  function encuadreDe(img) {
+    var pos = img.style.objectPosition ||
+      getComputedStyle(img).objectPosition || '50% 50%';
+    var z = zoomDe(img);
+    return z > 1.001 ? pos + ' ' + z.toFixed(2) : pos;
+  }
 
   function boton(texto, alPulsar, clase) {
     var b = document.createElement('button');
@@ -213,7 +262,10 @@
       var el = document.querySelector('[data-edit-img="' + hueco + '"]');
       if (!el) return;
       if (fotos[hueco].blob) el.src = fotos[hueco].urlAntes;
-      if ('posAntes' in fotos[hueco]) el.style.objectPosition = fotos[hueco].posAntes;
+      if ('posAntes' in fotos[hueco]) {
+        el.style.objectPosition = fotos[hueco].posAntes;
+        aplicaZoom(el, fotos[hueco].zoomAntes || 1);
+      }
     });
     sal();
   }
@@ -288,14 +340,16 @@
     var subidas = Object.keys(fotos).filter(function (h) { return fotos[h].blob; })
       .map(function (hueco) {
         var foto = fotos[hueco];
+        var el = document.querySelector('[data-edit-img="' + hueco + '"]');
         var camino = pagina + '/' + hueco + '-' + Date.now() + foto.ext;
         return cliente.storage.from('imagenes')
           .upload(camino, foto.blob, { contentType: foto.blob.type || 'image/jpeg' })
           .then(function (r) {
             if (r.error) throw r.error;
             var publica = cliente.storage.from('imagenes').getPublicUrl(camino);
+            /* El encuadre que se guarda es el que se está viendo. */
             return { pagina: pagina, hueco: hueco, url: publica.data.publicUrl,
-                     posicion: foto.posicion || null };
+                     posicion: foto.posicion || (el ? encuadreDe(el) : null) };
           });
       });
 
