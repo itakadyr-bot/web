@@ -343,7 +343,13 @@
         var el = document.querySelector('[data-edit-img="' + hueco + '"]');
         var camino = pagina + '/' + hueco + '-' + Date.now() + foto.ext;
         return cliente.storage.from('imagenes')
-          .upload(camino, foto.blob, { contentType: foto.blob.type || 'image/jpeg' })
+          .upload(camino, foto.blob, {
+            contentType: foto.blob.type || 'image/jpeg',
+            /* cada guardado crea un archivo nuevo, así que el navegador
+               puede quedarse esta foto un año sin miedo: es lo que quita
+               el parpadeo en las visitas siguientes */
+            cacheControl: '31536000'
+          })
           .then(function (r) {
             if (r.error) throw r.error;
             var publica = cliente.storage.from('imagenes').getPublicUrl(camino);

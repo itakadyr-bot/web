@@ -36,11 +36,21 @@
     if (el && f.valor != null) el.innerText = f.valor;
   }
 
-  /* El encuadre guardado es «x% y%» y, si hay zoom, «x% y% 1.4». */
-  function aplicaImagen(f) {
+  /* El encuadre guardado es «x% y%» y, si hay zoom, «x% y% 1.4».
+     `suave` es para lo que llega de la red DESPUÉS de pintar: la foto
+     no se cambia hasta tenerla descargada, para no enseñar el hueco. */
+  function aplicaImagen(f, suave) {
     var el = document.querySelector('[data-edit-img="' + f.hueco + '"]');
     if (!el) return;
-    if (f.url && f.url !== el.getAttribute('src')) el.src = f.url;
+    if (f.url && f.url !== el.getAttribute('src') && f.url !== el.src) {
+      if (suave) {
+        var previa = new Image();
+        previa.onload = function () { el.src = f.url; };
+        previa.src = f.url;
+      } else {
+        el.src = f.url;
+      }
+    }
     if (f.posicion) {
       var partes = f.posicion.trim().split(/\s+/);
       el.style.objectPosition = partes.slice(0, 2).join(' ');
@@ -51,9 +61,9 @@
     }
   }
 
-  function aplica(datos) {
+  function aplica(datos, suave) {
     (datos.textos || []).forEach(aplicaTexto);
-    (datos.imagenes || []).forEach(aplicaImagen);
+    (datos.imagenes || []).forEach(function (f) { aplicaImagen(f, suave); });
   }
 
   var CLAVE = 'itaka-contenido-' + pagina;
@@ -68,7 +78,7 @@
     window.ITAKA.rest('imagenes_web' + filtro + '&select=hueco,url,posicion')
   ]).then(function (r) {
     var datos = { textos: r[0] || [], imagenes: r[1] || [] };
-    aplica(datos);
+    aplica(datos, true);
     try { localStorage.setItem(CLAVE, JSON.stringify(datos)); } catch (e) { /* lleno o privado */ }
   }).catch(function (e) { console.warn('[Ítaka] contenido:', e.message); });
 })();
