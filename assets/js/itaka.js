@@ -65,7 +65,8 @@
   document.querySelectorAll('a[data-abre]').forEach(function (a) {
     a.addEventListener('click', function () {
       var img = document.querySelector('[data-edit-img="' + a.getAttribute('data-abre') + '"]');
-      if (img) a.href = img.currentSrc || img.src;
+      /* si el hueco lleva un PDF detrás, se abre el PDF; si no, la foto */
+      if (img) a.href = img.getAttribute('data-archivo') || img.currentSrc || img.src;
     });
   });
 

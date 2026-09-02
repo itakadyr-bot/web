@@ -323,25 +323,86 @@
   function eligeFoto(el) {
     var entrada = document.createElement('input');
     entrada.type = 'file';
-    entrada.accept = 'image/*';
+    entrada.accept = 'image/*,application/pdf';
     entrada.addEventListener('change', function () {
       var archivo = entrada.files && entrada.files[0];
       if (!archivo) return;
       var hueco = el.getAttribute('data-edit-img');
-      aviso.textContent = 'Preparando la foto…';
-      preparaFoto(archivo).then(function (lista) {
+      var esPdf = archivo.type === 'application/pdf';
+      aviso.textContent = esPdf ? 'Leyendo el PDF…' : 'Preparando la foto…';
+      (esPdf ? preparaPdf(archivo) : preparaFoto(archivo)).then(function (lista) {
         if (!fotos[hueco]) fotos[hueco] = { urlAntes: el.src };
         fotos[hueco].blob = lista.blob;
         fotos[hueco].ext = lista.ext;
+        fotos[hueco].pdf = lista.pdf || null;
         el.src = URL.createObjectURL(lista.blob);
-        aviso.textContent = 'Foto lista; se sube al guardar';
-      }).catch(function () {
+        aviso.textContent = esPdf
+          ? 'PDF listo (se verá su primera página); se sube al guardar'
+          : 'Foto lista; se sube al guardar';
+      }).catch(function (e) {
         /* Chrome no sabe leer los HEIC del iPhone; Safari sí. */
-        aviso.textContent = 'No puedo leer esa foto. Si es del iPhone (HEIC), ' +
-          'ábrela en Fotos y exporta como JPG, o inténtalo desde Safari.';
+        aviso.textContent = esPdf
+          ? 'No pude leer ese PDF: ' + (e && e.message ? e.message : 'prueba con otro archivo.')
+          : 'No puedo leer esa foto. Si es del iPhone (HEIC), ' +
+            'ábrela en Fotos y exporta como JPG, o inténtalo desde Safari.';
       });
     });
     entrada.click();
+  }
+
+  /* ------------------------------------------------------------
+     PDFs (el folleto del campus, los carteles): se sube el PDF tal
+     cual y, para el hueco de la página, se fabrica una imagen de su
+     primera página con pdf.js. La librería solo se carga aquí, en
+     el momento de elegir un PDF, y solo para administración: una
+     visita normal jamás la descarga.
+     ------------------------------------------------------------ */
+  var cargaPdfjs = null;
+  function conPdfjs() {
+    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+    if (!cargaPdfjs) {
+      cargaPdfjs = new Promise(function (listo, mal) {
+        var s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+        s.onload = function () {
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+          listo(window.pdfjsLib);
+        };
+        s.onerror = function () { mal(new Error('no se pudo cargar el lector de PDF')); };
+        document.head.appendChild(s);
+      });
+    }
+    return cargaPdfjs;
+  }
+
+  function preparaPdf(archivo) {
+    if (archivo.size > 15 * 1024 * 1024) {
+      return Promise.reject(new Error('pesa más de 15 MB; expórtalo más ligero.'));
+    }
+    return conPdfjs().then(function (pdfjs) {
+      return archivo.arrayBuffer().then(function (datos) {
+        return pdfjs.getDocument({ data: datos }).promise;
+      });
+    }).then(function (doc) {
+      return doc.getPage(1);
+    }).then(function (pagina) {
+      var vista = pagina.getViewport({ scale: 1 });
+      var escala = 1200 / vista.width;
+      vista = pagina.getViewport({ scale: escala });
+      var lienzo = document.createElement('canvas');
+      lienzo.width = Math.round(vista.width);
+      lienzo.height = Math.round(vista.height);
+      return pagina.render({ canvasContext: lienzo.getContext('2d'), viewport: vista })
+        .promise.then(function () {
+          return new Promise(function (listo, mal) {
+            lienzo.toBlob(function (b) {
+              if (b) listo({ blob: b, ext: '.jpg', pdf: archivo });
+              else mal(new Error('no se pudo generar la vista previa'));
+            }, 'image/jpeg', 0.85);
+          });
+        });
+    });
   }
 
   /* Deja la foto lista para la web: si es enorme se encoge a 2000 px
@@ -391,8 +452,9 @@
       .map(function (hueco) {
         var foto = fotos[hueco];
         var el = document.querySelector('[data-edit-img="' + hueco + '"]');
-        var camino = pagina + '/' + hueco + '-' + Date.now() + foto.ext;
-        return cliente.storage.from('imagenes')
+        var sello = Date.now();
+        var camino = pagina + '/' + hueco + '-' + sello + foto.ext;
+        var subida = cliente.storage.from('imagenes')
           .upload(camino, foto.blob, {
             contentType: foto.blob.type || 'image/jpeg',
             /* cada guardado crea un archivo nuevo, así que el navegador
@@ -402,11 +464,26 @@
           })
           .then(function (r) {
             if (r.error) throw r.error;
-            var publica = cliente.storage.from('imagenes').getPublicUrl(camino);
-            /* El encuadre que se guarda es el que se está viendo. */
-            return { pagina: pagina, hueco: hueco, url: publica.data.publicUrl,
-                     posicion: foto.posicion || (el ? encuadreDe(el) : null) };
+            return cliente.storage.from('imagenes').getPublicUrl(camino).data.publicUrl;
           });
+        /* Si lo elegido fue un PDF, se sube también el original: la
+           imagen es su portada y el PDF es lo que se descarga. */
+        var subidaPdf = !foto.pdf ? Promise.resolve(null)
+          : cliente.storage.from('imagenes')
+            .upload(pagina + '/' + hueco + '-' + sello + '.pdf', foto.pdf, {
+              contentType: 'application/pdf', cacheControl: '31536000'
+            })
+            .then(function (r) {
+              if (r.error) throw r.error;
+              return cliente.storage.from('imagenes')
+                .getPublicUrl(pagina + '/' + hueco + '-' + sello + '.pdf').data.publicUrl;
+            });
+        return Promise.all([subida, subidaPdf]).then(function (urls) {
+          /* El encuadre que se guarda es el que se está viendo. Si esta
+             vez no hay PDF, `archivo` se limpia a propósito. */
+          return { pagina: pagina, hueco: hueco, url: urls[0], archivo: urls[1],
+                   posicion: foto.posicion || (el ? encuadreDe(el) : null) };
+        });
       });
 
     /* Encuadres sin foto nueva: se guarda la dirección que ya tenía la

@@ -77,6 +77,9 @@ create table if not exists public.imagenes_web (
 );
 -- Si la tabla ya existía de antes sin la columna del encuadre:
 alter table public.imagenes_web add column if not exists posicion text;
+-- …ni la del PDF (cuando el hueco lleva un folleto o cartel en PDF,
+-- aquí se guarda su dirección; lo que se ve es su primera página):
+alter table public.imagenes_web add column if not exists archivo text;
 alter table public.imagenes_web enable row level security;
 
 drop policy if exists "cualquiera lee imagenes" on public.imagenes_web;

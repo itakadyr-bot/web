@@ -37,6 +37,9 @@
   function aplicaImagen(f, suave) {
     var el = document.querySelector('[data-edit-img="' + f.hueco + '"]');
     if (!el) return;
+    /* Si la «foto» vino de un PDF, la dirección del PDF viaja con el
+       hueco: es lo que abrirá el enlace de descarga. */
+    if (f.archivo) el.setAttribute('data-archivo', f.archivo);
     if (f.url && f.url !== el.getAttribute('src') && f.url !== el.src) {
       if (suave) {
         var previa = new Image();
@@ -70,7 +73,7 @@
   var filtro = '?pagina=eq.' + pagina;
   Promise.all([
     window.ITAKA.rest('contenido_web' + filtro + '&select=hueco,valor'),
-    window.ITAKA.rest('imagenes_web' + filtro + '&select=hueco,url,posicion')
+    window.ITAKA.rest('imagenes_web' + filtro + '&select=hueco,url,posicion,archivo')
   ]).then(function (r) {
     var datos = { textos: r[0] || [], imagenes: r[1] || [] };
     aplica(datos, true);
