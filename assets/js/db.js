@@ -25,6 +25,34 @@
   var script = document.currentScript;
   var BASE = script ? script.src.replace(/assets\/js\/db\.js.*$/, '') : './';
 
+  /* Qué página es esta, por la ruta. Sirve igual en local, en
+     GitHub Pages (/web/campamentos/) y en itakadyr.com. */
+  var CONOCIDAS = ['campamentos', 'campus', 'servicios', 'nosotros', 'contacto', 'legal', 'acceso'];
+  var pagina = 'inicio';
+  location.pathname.split('/').forEach(function (trozo) {
+    if (CONOCIDAS.indexOf(trozo) >= 0) pagina = trozo;
+  });
+
+  /* CONTRA EL PARPADEO, PARTE 2 · Las fotos que están escritas en el
+     HTML empiezan a descargarse en cuanto el navegador lee la página;
+     las editadas, en cambio, solo se conocen cuando corre el script, y
+     ese retraso se veía como un pestañeo. Este archivo va en la
+     CABECERA, así que aquí se mira la copia local y se le ordena al
+     navegador precargar esas fotos desde el primer instante, igual que
+     las fijas. */
+  try {
+    var copia = JSON.parse(localStorage.getItem('itaka-contenido-' + pagina));
+    ((copia && copia.imagenes) || []).slice(0, 12).forEach(function (f) {
+      if (f.url && /^https?:/.test(f.url)) {
+        var l = document.createElement('link');
+        l.rel = 'preload';
+        l.as = 'image';
+        l.href = f.url;
+        document.head.appendChild(l);
+      }
+    });
+  } catch (e) { /* sin copia local: no pasa nada */ }
+
   /* --- Lectura y escritura sencillas por REST (sin librería) ---- */
 
   function rest(camino, opciones) {
@@ -95,6 +123,7 @@
     URL: URL,
     KEY: KEY,
     BASE: BASE,
+    pagina: pagina,
     rest: rest,
     conCliente: conCliente,
     haySesionGuardada: haySesionGuardada

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus de verano — Ítaka Deporte y Recreación</title>
+<meta name="description" content="Campus de verano en Alicante de 3 a 16 años: deporte, piscina, talleres y una excursión cada semana, de 9:00 a 14:00 con matinera y comedor opcionales.">
+<link rel="icon" href="../assets/img/icono.png">
+<link rel="preconnect" href="https://oopyndrewijbqcryfbuj.supabase.co" crossorigin="">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/css/itaka.css">
+<script src="../assets/js/itaka.js" defer></script>
+<script src="../assets/js/db.js"></script>
+<script src="../assets/js/editar-en-vivo.js" defer></script>
+<style>
+  /* Solo lo propio de esta página: las dos tablas del campus. */
+  .tabla-marco { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #e9edf1; border-radius: 22px; background: #fff; box-shadow: 0 1px 2px rgba(11,18,27,.04), 0 18px 40px -20px rgba(11,18,27,.22); }
+  .tabla-campus { width: 100%; min-width: 760px; border-collapse: collapse; font-size: 15px; }
+  .tabla-campus thead th { background: #f1f4f7; color: #3b4a5c; font-weight: 700; font-size: 13px; padding: 13px 10px; text-align: center; line-height: 1.35; border-bottom: 1px solid #e9edf1; }
+  .tabla-campus thead th:first-child { text-align: left; padding-left: 18px; }
+  .tabla-campus thead th small { display: block; font-weight: 600; font-size: 11px; color: #8494a4; }
+  .tabla-campus thead th small.verde { color: #3f7a28; }
+  .tabla-campus tbody th { text-align: left; padding: 13px 18px; font-weight: 700; color: #14202e; white-space: nowrap; }
+  .tabla-campus tbody td { padding: 13px 10px; text-align: center; color: #5b6b7d; }
+  .tabla-campus tbody td.dest { color: #14202e; font-weight: 700; }
+  .tabla-campus tbody tr { border-bottom: 1px solid #eef1f4; }
+  .tabla-campus tbody tr:last-child { border-bottom: 0; }
+  .tabla-campus tbody tr.resaltada { background: #eaf7fd; }
+  .tabla-horario { min-width: 640px; }
+  .tabla-horario td.act { padding: 5px; }
+  .tabla-horario .pill { display: flex; align-items: center; justify-content: center; height: 100%; min-height: 44px; border-radius: 10px; padding: 9px; text-align: center; font-size: 14px; font-weight: 600; }
+  .pill--matinera { background: #f1f4f7; color: #4a5a6c; }
+  .pill--deporte { background: #eaf7fd; color: #00477f; }
+  .pill--almuerzo { background: #fbf7ec; color: #8a6d1f; font-weight: 500; }
+  .pill--piscina { background: #dcebf5; color: #24557e; }
+  .pill--talleres { background: #edf7e4; color: #3f6622; }
+  .pill--excursion { background: #0b121b; color: #fff; }
+</style>
+</head>
+<body>
+<header class="cab cab--barra">
+  <div class="cab-caja">
+    <a href="../" class="cab-logo"><img src="../assets/img/logo-blanco.png" alt="Ítaka Deporte y Recreación" /></a>
+    <nav class="cab-nav" id="cab-menu">
+      <a href="../">Inicio</a>
+      <a href="../campamentos/">Campamentos</a>
+      <a href="../servicios/" class="activo">Servicios</a>
+      <a href="../nosotros/">Nosotros</a>
+      <a href="../contacto/">Contacto</a>
+      <a href="../contacto/" class="solo-movil">Pide presupuesto</a>
+    </nav>
+    <a href="../contacto/" class="cab-cta">Pide presupuesto</a>
+    <button class="cab-burger" type="button" aria-label="Abrir el menú" aria-expanded="false" aria-controls="cab-menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<section style="position:relative;background:#0b121b;color:#fff;overflow:hidden">
+  <img src="../assets/img/extraescolares-patinaje-2.jpg" alt="Niños y niñas haciendo deporte en el campus de verano" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%" data-edit-img="campus-hero">
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,18,27,.82) 0%,rgba(11,18,27,.45) 45%,rgba(11,18,27,.88) 100%)"></div>
+  <div style="position:relative;z-index:10;max-width:1180px;margin:0 auto;padding:clamp(70px,10vw,120px) 24px clamp(46px,6vw,70px)">
+    <div style="display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.12);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.24);color:#fff;font-weight:600;font-size:13px;letter-spacing:.06em;padding:7px 16px;border-radius:999px"><span style="width:6px;height:6px;border-radius:50%;background:#0075c4;display:block"></span>Verano · de 3 a 16 años</div>
+    <h1 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:clamp(44px,6.4vw,82px);line-height:.94;letter-spacing:-.025em;margin:22px 0 0;max-width:16ch;text-shadow:0 2px 30px rgba(0,0,0,.4)" data-edit="campus-de-verano-7758">Campus de verano</h1>
+    <p style="font-size:19px;line-height:1.55;color:rgba(255,255,255,.85);max-width:52ch;margin:18px 0 0" data-edit="deporte-piscina-juegos-de-agua-gymkanas-tall-cc35">Deporte, piscina, juegos de agua, gymkanas, talleres y una excursión cada semana. Todo con enfoque lúdico: el objetivo es que hagan deporte pasándolo bien.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:26px">
+      <span style="background:rgba(255,255,255,.14);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.22);font-size:13.5px;font-weight:700;padding:8px 16px;border-radius:999px" data-edit="29-jun-31-jul-35d0">29 jun – 31 jul</span>
+      <span style="background:rgba(255,255,255,.14);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.22);font-size:13.5px;font-weight:700;padding:8px 16px;border-radius:999px" data-edit="9-00-14-00-f7f8">9:00 – 14:00</span>
+      <span style="background:rgba(255,255,255,.14);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.22);font-size:13.5px;font-weight:700;padding:8px 16px;border-radius:999px" data-edit="ciudad-deportiva-de-alicante-4966">Ciudad Deportiva de Alicante</span>
+    </div>
+  </div>
+</section>
+
+<main style="display:flex;flex-direction:column">
+
+<section style="max-width:1180px;margin:0 auto;padding:70px 24px 0;width:100%">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:36px;align-items:start">
+    <div>
+      <div style="font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#0075c4" data-edit="conciliacion-de-verdad-acbf">Conciliación de verdad</div>
+      <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:clamp(34px,4.6vw,52px);line-height:1.02;letter-spacing:-.015em;margin:12px 0 18px" data-edit="las-vacaciones-de-ellos-sin-dejar-tirados-a-bbe6">Las vacaciones de ellos, sin dejar tirados a los padres</h2>
+      <p style="font-size:17px;line-height:1.6;color:#4a5a6c;margin:0 0 14px" data-edit="los-grupos-se-organizan-por-edad-y-cada-sema-b722">Los grupos se organizan por edad y cada semana tiene su programa: deporte por las mañanas, piscina casi a diario, talleres después del almuerzo y una excursión semanal.</p>
+      <p style="font-size:17px;line-height:1.6;color:#4a5a6c;margin:0 0 26px" data-edit="actividades-de-9-00-a-14-00-con-entrada-desd-04cd">Actividades de 9:00 a 14:00, con entrada desde las 8:30 y recogida hasta las 14:20 sin coste añadido. ¿Necesitas más margen? Hay matinera desde las 7:40 y comedor con recogida hasta las 15:30.</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <a href="../contacto/" style="background:#0b121b;color:#fff;font-weight:700;font-size:16px;padding:16px 30px;border-radius:999px;box-shadow:0 10px 30px -8px rgba(11,18,27,.35)" class="hv3" data-edit="reserva-plaza-7546">Reserva plaza</a>
+        <a href="https://wa.me/34698979952?text=Hola%2C%20quiero%20informaci%C3%B3n%20del%20campus%20de%20verano" style="border:1.5px solid #d8dee4;color:#14202e;font-weight:700;font-size:16px;padding:16px 30px;border-radius:999px" class="hv13" data-edit="preguntar-por-whatsapp-63dc">Preguntar por WhatsApp</a>
+      </div>
+    </div>
+    <dl style="margin:0;background:#fff;border:1px solid #e9edf1;border-radius:22px;padding:26px 26px 18px;box-shadow:0 1px 2px rgba(11,18,27,.04),0 18px 40px -22px rgba(11,18,27,.2)">
+      <div style="font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#0075c4;margin-bottom:14px" data-edit="de-un-vistazo-bc17">De un vistazo</div>
+      <div style="display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid #eef1f4"><dt style="font-size:15px;color:#8494a4" data-edit="edades-c2fa">Edades</dt><dd style="margin:0;font-size:15px;font-weight:700;text-align:right" data-edit="3-a-16-anos-3ecb">3 a 16 años</dd></div>
+      <div style="display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid #eef1f4"><dt style="font-size:15px;color:#8494a4" data-edit="fechas-6924">Fechas</dt><dd style="margin:0;font-size:15px;font-weight:700;text-align:right" data-edit="29-de-junio-a-31-de-julio-11ca">29 de junio a 31 de julio</dd></div>
+      <div style="display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid #eef1f4"><dt style="font-size:15px;color:#8494a4" data-edit="horario-3361">Horario</dt><dd style="margin:0;font-size:15px;font-weight:700;text-align:right" data-edit="9-00-14-00-f7f8-2">9:00 – 14:00</dd></div>
+      <div style="display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid #eef1f4"><dt style="font-size:15px;color:#8494a4" data-edit="entrada-y-recogida-9512">Entrada y recogida</dt><dd style="margin:0;font-size:15px;font-weight:700;text-align:right" data-edit="8-30-14-20-sin-coste-254e">8:30 – 14:20 sin coste</dd></div>
+      <div style="display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px solid #eef1f4"><dt style="font-size:15px;color:#8494a4" data-edit="donde-78a0">Dónde</dt><dd style="margin:0;font-size:15px;font-weight:700;text-align:right" data-edit="ciudad-deportiva-de-alicante-4966-2">Ciudad Deportiva de Alicante</dd></div>
+      <div style="display:flex;justify-content:space-between;gap:14px;padding:10px 0"><dt style="font-size:15px;color:#8494a4" data-edit="desde-9a36">Desde</dt><dd style="margin:0;font-size:15px;font-weight:700;text-align:right;color:#0075c4" data-edit="99-la-semana-a29c">99 € la semana</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section style="max-width:1180px;margin:0 auto;padding:70px 24px 0;width:100%">
+  <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:16px;margin-bottom:22px">
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:clamp(34px,4.6vw,52px);line-height:1;letter-spacing:-.015em;margin:0" data-edit="tarifas-3f31">Tarifas</h2>
+    <span style="margin-left:auto;font-size:15px;color:#5b6b7d" data-edit="15-de-descuento-para-el-segundo-hermano-no-a-510d">15 % de descuento para el segundo hermano (no aplica al comedor)</span>
+  </div>
+  <div class="tabla-marco">
+    <table class="tabla-campus">
+      <thead>
+        <tr>
+          <th scope="col" data-edit="semanas-3223">Semanas</th>
+          <th scope="col" data-edit="1-alumno-27ca">1 alumno</th>
+          <th scope="col">+ comedor<small>+42 €/sem</small></th>
+          <th scope="col">+ matinera<small>+12 €/sem</small></th>
+          <th scope="col">+ los dos<small>+54 €/sem</small></th>
+          <th scope="col">2 hermanos<small class="verde">−15 % el 2º</small></th>
+          <th scope="col">2 herm. + comedor<small>+84 €/sem</small></th>
+          <th scope="col">2 herm. + matinera<small>+12 €/sem</small></th>
+          <th scope="col">2 herm. + los dos<small>+96 €/sem</small></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row" data-edit="1-semana-e1ef">1 semana</th><td class="dest" data-edit="99-58c6">99 €</td><td data-edit="141-9fa4">141 €</td><td data-edit="111-4de2">111 €</td><td data-edit="153-3a6f">153 €</td><td class="dest" data-edit="184-6134">184 €</td><td data-edit="268-7050">268 €</td><td data-edit="196-6e05">196 €</td><td data-edit="280-4f77">280 €</td></tr>
+        <tr><th scope="row" data-edit="2-semanas-e8e7">2 semanas</th><td class="dest" data-edit="189-5849">189 €</td><td data-edit="273-e308">273 €</td><td data-edit="213-d202">213 €</td><td data-edit="297-118b">297 €</td><td class="dest" data-edit="349-ddec">349 €</td><td data-edit="517-39fc">517 €</td><td data-edit="373-ce69">373 €</td><td data-edit="541-eeaa">541 €</td></tr>
+        <tr><th scope="row" data-edit="3-semanas-f373">3 semanas</th><td class="dest" data-edit="249-c791">249 €</td><td data-edit="375-0097">375 €</td><td data-edit="285-bb7a">285 €</td><td data-edit="411-7313">411 €</td><td class="dest" data-edit="460-5a4b">460 €</td><td data-edit="712-387b">712 €</td><td data-edit="496-b9f5">496 €</td><td data-edit="748-ac94">748 €</td></tr>
+        <tr><th scope="row" data-edit="4-semanas-f5f6">4 semanas</th><td class="dest" data-edit="299-92c9">299 €</td><td data-edit="467-76ef">467 €</td><td data-edit="347-2087">347 €</td><td data-edit="515-bb6a">515 €</td><td class="dest" data-edit="553-d1c1">553 €</td><td data-edit="889-a984">889 €</td><td data-edit="601-c651">601 €</td><td data-edit="937-4392">937 €</td></tr>
+        <tr class="resaltada"><th scope="row" data-edit="5-semanas-7a84">5 semanas</th><td class="dest" data-edit="349-ddec-2">349 €</td><td data-edit="559-a29b">559 €</td><td data-edit="409-422e">409 €</td><td data-edit="619-043e">619 €</td><td class="dest" data-edit="645-e22b">645 €</td><td data-edit="1-065-4a83">1.065 €</td><td data-edit="705-8bcb">705 €</td><td data-edit="1-125-f25a">1.125 €</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin:14px 0 0;font-size:14.5px;color:#8494a4" data-edit="el-comedor-cuesta-42-semana-por-persona-la-m-9576">El comedor cuesta 42 €/semana por persona · la matinera 12 €/semana por familia, aunque vengan varios hermanos.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:26px">
+    <div style="background:#fff;border:1px solid #e9edf1;border-radius:22px;padding:26px;box-shadow:0 1px 2px rgba(11,18,27,.04),0 18px 40px -22px rgba(11,18,27,.2)">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:14px">
+        <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:26px;margin:0;line-height:1" data-edit="formas-de-pago-1a55">Formas de pago</h3>
+        <span style="font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8494a4" data-edit="transferencia-7c88">Transferencia</span>
+      </div>
+      <div style="display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #eef1f4"><span style="font-size:13px;font-weight:700;color:#0075c4;padding-top:3px">1</span><p style="margin:0;font-size:15px;line-height:1.5" data-edit="el-100-del-importe-en-los-diez-dias-siguient-1e90">El 100 % del importe en los diez días siguientes a recibir la confirmación.</p></div>
+      <div style="display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #eef1f4"><span style="font-size:13px;font-weight:700;color:#0075c4;padding-top:3px">2</span><p style="margin:0;font-size:15px;line-height:1.5" data-edit="el-50-en-diez-dias-y-el-50-restante-antes-de-22f0">El 50 % en diez días y el 50 % restante antes del 15 de mayo.</p></div>
+      <div style="display:flex;gap:11px;align-items:flex-start;padding:9px 0"><span style="font-size:13px;font-weight:700;color:#0075c4;padding-top:3px">3</span><p style="margin:0;font-size:15px;line-height:1.5" data-edit="si-lo-contratado-pasa-de-350-en-tres-o-cuatr-3505">Si lo contratado pasa de 350 €, en tres o cuatro cuotas, con 150 € de reserva.</p></div>
+    </div>
+    <div style="background:#fff;border:1px solid #e9edf1;border-radius:22px;padding:26px;box-shadow:0 1px 2px rgba(11,18,27,.04),0 18px 40px -22px rgba(11,18,27,.2)">
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:26px;margin:0 0 14px;line-height:1" data-edit="servicios-opcionales-9866">Servicios opcionales</h3>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0;border-bottom:1px solid #eef1f4">
+        <div><div style="font-size:15px;font-weight:600" data-edit="matinera-7-40-a-9-00-963d">Matinera · 7:40 a 9:00</div><div style="font-size:13px;color:#8494a4" data-edit="por-familia-aunque-vengan-varios-hermanos-3312">Por familia, aunque vengan varios hermanos</div></div>
+        <span style="font-size:15px;font-weight:700;white-space:nowrap" data-edit="12-sem-7ab4">12 €/sem</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0">
+        <div><div style="font-size:15px;font-weight:600" data-edit="comedor-recogida-15-00-15-30-5933">Comedor · recogida 15:00-15:30</div><div style="font-size:13px;color:#8494a4" data-edit="ensalada-pan-plato-principal-agua-y-postre-55fb">Ensalada, pan, plato principal, agua y postre</div></div>
+        <span style="font-size:15px;font-weight:700;white-space:nowrap" data-edit="42-sem-ce96">42 €/sem</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="margin-top:70px;background:#f1f4f7;border-block:1px solid #e4e9ee">
+  <div style="max-width:1180px;margin:0 auto;padding:60px 24px;width:100%">
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:16px;margin-bottom:22px">
+      <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:clamp(34px,4.6vw,52px);line-height:1;letter-spacing:-.015em;margin:0" data-edit="un-dia-en-el-campus-0be4">Un día en el campus</h2>
+      <span style="margin-left:auto;font-size:15px;color:#5b6b7d" data-edit="los-dias-de-piscina-pueden-variar-segun-la-d-d0a3">Los días de piscina pueden variar según la disponibilidad municipal</span>
+    </div>
+    <div class="tabla-marco">
+      <table class="tabla-campus tabla-horario">
+        <thead>
+          <tr>
+            <th scope="col" data-edit="hora-17f2">Hora</th>
+            <th scope="col" data-edit="lunes-4b1d">Lunes</th>
+            <th scope="col" data-edit="martes-7391">Martes</th>
+            <th scope="col" data-edit="miercoles-8605">Miércoles</th>
+            <th scope="col" data-edit="jueves-943a">Jueves</th>
+            <th scope="col" data-edit="viernes-99e3">Viernes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row" data-edit="7-40-8-45-a23e">7:40-8:45</th>
+            <td class="act"><div class="pill pill--matinera" data-edit="matinera-3e41">Matinera</div></td>
+            <td class="act"><div class="pill pill--matinera" data-edit="matinera-3e41-2">Matinera</div></td>
+            <td class="act"><div class="pill pill--matinera" data-edit="matinera-3e41-3">Matinera</div></td>
+            <td class="act"><div class="pill pill--matinera" data-edit="matinera-3e41-4">Matinera</div></td>
+            <td class="act"><div class="pill pill--matinera" data-edit="matinera-3e41-5">Matinera</div></td>
+          </tr>
+          <tr>
+            <th scope="row" data-edit="9-00-10-30-dc6b">9:00-10:30</th>
+            <td class="act"><div class="pill pill--deporte" data-edit="deporte-0248">Deporte</div></td>
+            <td class="act"><div class="pill pill--deporte" data-edit="multideporte-c76e">Multideporte</div></td>
+            <td class="act"><div class="pill pill--deporte" data-edit="deporte-0248-2">Deporte</div></td>
+            <td class="act"><div class="pill pill--deporte" data-edit="multideporte-c76e-2">Multideporte</div></td>
+            <td class="act" rowspan="4"><div class="pill pill--excursion" style="min-height:100%" data-edit="excursion-2faa">Excursión</div></td>
+          </tr>
+          <tr>
+            <th scope="row" data-edit="10-30-11-00-8514">10:30-11:00</th>
+            <td class="act"><div class="pill pill--almuerzo" data-edit="almuerzo-5b24">Almuerzo</div></td>
+            <td class="act"><div class="pill pill--almuerzo" data-edit="almuerzo-5b24-2">Almuerzo</div></td>
+            <td class="act"><div class="pill pill--almuerzo" data-edit="almuerzo-5b24-3">Almuerzo</div></td>
+            <td class="act"><div class="pill pill--almuerzo" data-edit="almuerzo-5b24-4">Almuerzo</div></td>
+          </tr>
+          <tr>
+            <th scope="row" data-edit="11-00-12-00-35bd">11:00-12:00</th>
+            <td class="act"><div class="pill pill--piscina" data-edit="piscina-772d">Piscina</div></td>
+            <td class="act"><div class="pill pill--piscina" data-edit="piscina-772d-2">Piscina</div></td>
+            <td class="act"><div class="pill pill--piscina" data-edit="piscina-772d-3">Piscina</div></td>
+            <td class="act"><div class="pill pill--piscina" data-edit="piscina-772d-4">Piscina</div></td>
+          </tr>
+          <tr>
+            <th scope="row" data-edit="12-30-14-00-b6c9">12:30-14:00</th>
+            <td class="act"><div class="pill pill--talleres" data-edit="talleres-d76f">Talleres</div></td>
+            <td class="act"><div class="pill pill--talleres" data-edit="talleres-d76f-2">Talleres</div></td>
+            <td class="act"><div class="pill pill--talleres" data-edit="talleres-d76f-3">Talleres</div></td>
+            <td class="act"><div class="pill pill--talleres" data-edit="talleres-d76f-4">Talleres</div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:20px">
+      <div style="background:#fff;border:1px solid #e9edf1;border-radius:18px;padding:20px 22px">
+        <div style="font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#0075c4;margin-bottom:6px" data-edit="excursiones-4a29">Excursiones</div>
+        <p style="margin:0;font-size:15px;line-height:1.55;color:#4a5a6c" data-edit="palmeral-de-elche-palmeral-de-alicante-unive-f721">Palmeral de Elche, Palmeral de Alicante, Universidad de Alicante, Castillo de Santa Bárbara y San Fernando. Una por semana y grupo; por logística el día puede variar de martes a viernes.</p>
+      </div>
+      <div style="background:#fff;border:1px solid #e9edf1;border-radius:18px;padding:20px 22px">
+        <div style="font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#0075c4;margin-bottom:6px" data-edit="talleres-d76f-5">Talleres</div>
+        <p style="margin:0;font-size:15px;line-height:1.55;color:#4a5a6c" data-edit="manualidades-dibujo-juegos-de-mesa-juegos-tr-05a0">Manualidades, dibujo, juegos de mesa, juegos tradicionales y construcciones. Deporte en el estadio, multideporte y talleres en las pistas anexas y natación en la piscina municipal.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="max-width:1180px;margin:0 auto;padding:70px 24px 0;width:100%">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px">
+    <div style="background:#fff;border:1px solid #e9edf1;border-radius:22px;padding:26px;box-shadow:0 1px 2px rgba(11,18,27,.04),0 18px 40px -22px rgba(11,18,27,.2)">
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:26px;margin:0 0 12px;line-height:1" data-edit="que-incluye-5190">Qué incluye</h3>
+      <div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #eef1f4"><span style="color:#0075c4;font-weight:700">✓</span><span style="font-size:15px" data-edit="camiseta-del-campus-3cc2">Camiseta del campus</span></div>
+      <div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #eef1f4"><span style="color:#0075c4;font-weight:700">✓</span><span style="font-size:15px" data-edit="gorro-de-piscina-e7e2">Gorro de piscina</span></div>
+      <div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #eef1f4"><span style="color:#0075c4;font-weight:700">✓</span><span style="font-size:15px" data-edit="autobus-de-las-excursiones-f276">Autobús de las excursiones</span></div>
+      <div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #eef1f4"><span style="color:#0075c4;font-weight:700">✓</span><span style="font-size:15px" data-edit="seguro-de-accidentes-y-rc-7ae4">Seguro de accidentes y RC</span></div>
+      <div style="display:flex;gap:10px;align-items:center;padding:8px 0"><span style="color:#0075c4;font-weight:700">✓</span><span style="font-size:15px" data-edit="monitores-titulados-0b57">Monitores titulados</span></div>
+    </div>
+    <div style="background:#fff;border:1px solid #e9edf1;border-radius:22px;padding:26px;box-shadow:0 1px 2px rgba(11,18,27,.04),0 18px 40px -22px rgba(11,18,27,.2)">
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:26px;margin:0 0 14px;line-height:1" data-edit="que-traer-cada-dia-b033">Qué traer cada día</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <span style="background:#f1f4f7;color:#4a5a6c;font-size:13.5px;font-weight:600;padding:7px 14px;border-radius:999px" data-edit="banador-f5bb">Bañador</span>
+        <span style="background:#f1f4f7;color:#4a5a6c;font-size:13.5px;font-weight:600;padding:7px 14px;border-radius:999px" data-edit="toalla-6fcb">Toalla</span>
+        <span style="background:#f1f4f7;color:#4a5a6c;font-size:13.5px;font-weight:600;padding:7px 14px;border-radius:999px" data-edit="gorro-de-bano-71c2">Gorro de baño</span>
+        <span style="background:#f1f4f7;color:#4a5a6c;font-size:13.5px;font-weight:600;padding:7px 14px;border-radius:999px" data-edit="chanclas-0a9e">Chanclas</span>
+        <span style="background:#f1f4f7;color:#4a5a6c;font-size:13.5px;font-weight:600;padding:7px 14px;border-radius:999px" data-edit="camiseta-de-recambio-92d1">Camiseta de recambio</span>
+        <span style="background:#f1f4f7;color:#4a5a6c;font-size:13.5px;font-weight:600;padding:7px 14px;border-radius:999px" data-edit="botella-de-agua-0145">Botella de agua</span>
+        <span style="background:#f1f4f7;color:#4a5a6c;font-size:13.5px;font-weight:600;padding:7px 14px;border-radius:999px" data-edit="proteccion-solar-28a3">Protección solar</span>
+        <span style="background:#f1f4f7;color:#4a5a6c;font-size:13.5px;font-weight:600;padding:7px 14px;border-radius:999px" data-edit="gorra-9d18">Gorra</span>
+        <span style="background:#f1f4f7;color:#4a5a6c;font-size:13.5px;font-weight:600;padding:7px 14px;border-radius:999px" data-edit="almuerzo-5b24-5">Almuerzo</span>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #e9edf1;border-radius:22px;padding:26px;box-shadow:0 1px 2px rgba(11,18,27,.04),0 18px 40px -22px rgba(11,18,27,.2)">
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:26px;margin:0 0 12px;line-height:1" data-edit="quien-los-cuida-bd2a">Quién los cuida</h3>
+      <p style="margin:0 0 14px;font-size:15px;line-height:1.55;color:#4a5a6c" data-edit="personal-titulado-de-itaka-graduados-en-cafd-3962">Personal titulado de Ítaka: graduados en CAFD, maestros especialistas en Educación Física, monitores de tiempo libre y técnicos deportivos.</p>
+      <p style="margin:0;font-size:15px;line-height:1.55;color:#4a5a6c" data-edit="ratios-ajustadas-por-edad-certificado-de-del-f81d">Ratios ajustadas por edad, certificado de delitos sexuales verificado para todo el personal y delegado de protección, como en todas nuestras actividades.</p>
+      <a href="../nosotros/#garantias" style="display:inline-block;margin-top:14px;font-weight:700;font-size:15px" data-edit="ver-todas-las-garantias-4697">Ver todas las garantías →</a>
+    </div>
+  </div>
+</section>
+
+<section style="max-width:1180px;margin:70px auto 0;padding:0 24px;width:100%">
+  <div style="background:#0b121b;border-radius:28px;padding:clamp(32px,4.6vw,54px);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap;box-shadow:0 30px 70px -34px rgba(11,18,27,.6)">
+    <div>
+      <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:clamp(32px,4.6vw,48px);line-height:1;letter-spacing:-.015em;margin:0" data-edit="plazas-limitadas-por-semana-072f">Plazas limitadas por semana</h2>
+      <p style="font-size:16px;line-height:1.55;margin:10px 0 0;color:#c3d0de" data-edit="cada-semana-cierra-el-viernes-anterior-698-9-00f7">Cada semana cierra el viernes anterior · 698 979 952 · itakadyr@gmail.com</p>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <a href="../contacto/" style="background:#fff;color:#0b121b;font-weight:700;font-size:16px;padding:16px 30px;border-radius:999px" class="hv3" data-edit="reserva-plaza-7546-2">Reserva plaza</a>
+      <a href="https://wa.me/34698979952?text=Hola%2C%20quiero%20informaci%C3%B3n%20del%20campus%20de%20verano" style="border:1.5px solid rgba(255,255,255,.45);color:#fff;font-weight:700;font-size:16px;padding:16px 30px;border-radius:999px" class="hv8" data-edit="preguntar-por-whatsapp-63dc-2">Preguntar por WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer style="margin-top:86px;background:#14202e;color:#8fa3ba;font-size:14px">
+  <div style="max-width:1180px;margin:0 auto;padding:52px 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:36px">
+    <div>
+      <img src="../assets/img/logo-blanco.png" alt="Ítaka Deporte y Recreación" style="height:44px;width:auto;display:block" data-edit-img="logo-blanco">
+      <p style="margin:14px 0 0;line-height:1.55" data-edit="alicante-espana-38e8">Alicante, España</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <div style="color:#fff;font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase" data-edit="servicios-0ecc">Servicios</div>
+      <a href="../campamentos/" style="color:#8fa3ba" data-edit="campamentos-b769">Campamentos</a>
+      <a href="../campus/" style="color:#8fa3ba" data-edit="campus-de-verano-7758-2">Campus de verano</a>
+      <a href="../servicios/" style="color:#8fa3ba" data-edit="escuelas-deportivas-f25d">Escuelas deportivas</a>
+      <a href="../servicios/" style="color:#8fa3ba" data-edit="fiestas-y-cumpleanos-fba8">Fiestas y cumpleaños</a>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <div style="color:#fff;font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase" data-edit="itaka-4c14">Ítaka</div>
+      <a href="../" style="color:#8fa3ba" data-edit="inicio-bf89">Inicio</a>
+      <a href="../nosotros/" style="color:#8fa3ba" data-edit="nosotros-c734">Nosotros</a>
+      <a href="../nosotros/#garantias" style="color:#8fa3ba" data-edit="garantias-y-seguridad-e691">Garantías y seguridad</a>
+      <a href="../contacto/" style="color:#8fa3ba" data-edit="contacto-0a25">Contacto</a>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <div style="color:#fff;font-weight:700;font-size:13px;letter-spacing:.1em;text-transform:uppercase" data-edit="contacto-0a25-2">Contacto</div>
+      <a href="tel:+34698979952" style="color:#8fa3ba" data-edit="698-979-952-c1cf">698 979 952</a>
+      <a href="mailto:itakadyr@gmail.com" style="color:#8fa3ba" data-edit="itakadyr-gmail-com-eaed">itakadyr@gmail.com</a>
+    </div>
+  </div>
+  <div style="border-top:1px solid #24354a"><div style="max-width:1180px;margin:0 auto;padding:20px 24px;display:flex;flex-wrap:wrap;gap:18px;font-size:13px"><span data-edit="2026-itaka-deporte-y-recreacion-e9a4">© 2026 Ítaka Deporte y Recreación</span><a href="../legal/#aviso-legal" style="color:#8fa3ba" data-edit="aviso-legal-236a">Aviso legal</a><a href="../legal/#privacidad" style="color:#8fa3ba" data-edit="privacidad-965c">Privacidad</a><a href="../legal/#cookies" style="color:#8fa3ba" data-edit="cookies-597b">Cookies</a></div></div>
+</footer>
+<script src="../assets/js/contenido.js"></script>
+</body>
+</html>

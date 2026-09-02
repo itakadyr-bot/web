@@ -21,14 +21,9 @@
   'use strict';
   if (!window.ITAKA) return;
 
-  /* Qué página es esta, por la ruta. Sirve igual en local, en
-     GitHub Pages (/web/campamentos/) y en itakadyr.com. */
-  var CONOCIDAS = ['campamentos', 'servicios', 'nosotros', 'contacto', 'legal', 'acceso'];
-  var pagina = 'inicio';
-  location.pathname.split('/').forEach(function (trozo) {
-    if (CONOCIDAS.indexOf(trozo) >= 0) pagina = trozo;
-  });
-  window.ITAKA.pagina = pagina;
+  /* Qué página es esta lo calcula db.js (que además precarga las
+     fotos editadas desde la cabecera, para que no parpadeen). */
+  var pagina = window.ITAKA.pagina || 'inicio';
 
   function aplicaTexto(f) {
     var el = document.querySelector('[data-edit="' + f.hueco + '"]');
