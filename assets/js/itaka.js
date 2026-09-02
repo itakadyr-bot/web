@@ -40,17 +40,22 @@
       boton.disabled = true;
       if (aviso) { aviso.style.color = '#8494a4'; aviso.textContent = 'Enviando…'; }
 
+      /* El número del mensaje lo pone la propia web. Pedírselo de
+         vuelta a la base exigiría dejar LEER los mensajes a cualquiera,
+         y eso no: son datos de las familias. */
+      var id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : null;
+
       window.ITAKA.rest('mensajes', {
         method: 'POST',
-        headers: { Prefer: 'return=representation' },
         body: {
+          id: id || undefined,
           nombre: (datos.get('nombre') || '').trim(),
           email: (datos.get('email') || '').trim(),
           telefono: (datos.get('telefono') || '').trim(),
           interes: datos.get('interes') || '',
           mensaje: (datos.get('mensaje') || '').trim()
         }
-      }).then(function (filas) {
+      }).then(function () {
         boton.textContent = '¡Mensaje enviado!';
         if (aviso) {
           aviso.style.color = '#14202e';
@@ -58,7 +63,6 @@
         }
         /* El aviso al correo del club: si falla, no es problema de
            quien escribe, así que no se le enseña ningún error. */
-        var id = filas && filas[0] && filas[0].id;
         if (id) {
           fetch(window.ITAKA.URL + '/functions/v1/correo-avisar', {
             method: 'POST',
