@@ -225,3 +225,87 @@ img { max-width: 100%; }
 .hv13:hover{border-color:#0075c4 !important;color:#0075c4 !important}
 .hv14:hover{background:#00477f !important}
 .hv15:hover{background:#0075c4 !important;color:#fff !important}
+
+/* ------------------------------------------------------------
+   Desplegables de la cabecera (Campamentos, Servicios).
+   En escritorio se abren al pasar el ratón o al navegar con
+   teclado (focus-within); entran y salen por el mismo camino,
+   anclados al botón que los abre. En el móvil no hay «pasar el
+   ratón»: los sub-enlaces van siempre visibles, indentados.
+   ------------------------------------------------------------ */
+.cab-item { position: relative; display: flex; }
+.cab-item > a:first-child::after {
+  content: "▾";
+  font-size: 9px;
+  margin-left: 7px;
+  opacity: .6;
+}
+.cab-sub {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  min-width: 225px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  border-radius: 18px;
+  background: rgba(45, 55, 66, .97);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, .18);
+  box-shadow: 0 24px 50px -18px rgba(0, 0, 0, .55);
+  z-index: 60;
+  transform-origin: top center;
+  opacity: 0;
+  transform: translateX(-50%) scale(.96) translateY(-8px);
+  pointer-events: none;
+  transition: opacity .18s ease, transform .22s cubic-bezier(.2, .9, .3, 1);
+}
+/* Puente invisible: que el ratón no «caiga» en el hueco de camino al panel. */
+.cab-sub::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 0;
+  right: 0;
+  height: 12px;
+}
+.cab-item:hover .cab-sub,
+.cab-item:focus-within .cab-sub {
+  opacity: 1;
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+.cab-sub a {
+  color: rgba(255, 255, 255, .85);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 14.5px;
+  white-space: nowrap;
+}
+.cab-sub a:hover { background: rgba(255, 255, 255, .14); color: #fff; }
+
+@media (max-width: 920px) {
+  .cab-item { flex-direction: column; }
+  .cab-item > a:first-child::after { content: ""; margin: 0; }
+  .cab-sub {
+    position: static;
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    padding: 0 0 6px 16px;
+    min-width: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .cab-sub::before { display: none; }
+  .cab-nav .cab-sub a {
+    font-size: 15px;
+    padding: 8px 14px;
+    color: rgba(255, 255, 255, .68);
+  }
+}
