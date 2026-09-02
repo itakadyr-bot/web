@@ -26,7 +26,7 @@ repetirlos algún día:
    La web quedará en `https://<cuenta>.github.io/<repo>/` hasta que se
    apunte el dominio itakadyr.com.
 
-## 🔶 2 · Supabase — proyecto creado; falta ejecutar el SQL
+## ✅ 2 · Supabase — HECHO (2 sep 2026)
 
 Proyecto: `oopyndrewijbqcryfbuj.supabase.co` (Frankfurt). La web ya está
 conectada. Lo que queda: seguir `SETUP-SUPABASE.md` pasos 1–5 (pegar el SQL
@@ -42,7 +42,8 @@ y crear el usuario de administración). Pasos originales:
    SQL Editor, como en Apolana: tablas de contenido (modo fantasma), mensajes
    del formulario, campamentos y reservas, con sus políticas de seguridad.
 
-## 3 · Correo (que los mensajes lleguen a itakadyr@gmail.com)
+## ✅ 3 · Correo — HECHO (2 sep 2026). Función `correo-avisar` desplegada,
+## RESEND_API_KEY en los secrets, circuito probado de punta a punta.
 
 1. Crear cuenta gratuita en [resend.com](https://resend.com) **con
    itakadyr@gmail.com**. Sin verificar ningún dominio, Resend ya permite
@@ -55,7 +56,7 @@ y crear el usuario de administración). Pasos originales:
    responder a las familias desde ahí, se verifica el dominio en Resend
    (dos registros DNS).
 
-## 4 · Stripe (señal de reserva de campamento)
+## ⬜ 4 · Stripe (señal de reserva de campamento) — LO ÚNICO PENDIENTE
 
 1. Crear cuenta en [stripe.com](https://stripe.com) a nombre de Ítaka, con
    sus datos fiscales. Hasta el último paso se trabaja en **modo prueba**:
