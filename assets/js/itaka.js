@@ -58,6 +58,17 @@
     document.addEventListener('keydown', tecla);
   });
 
+  /* --- Abrir/descargar el archivo de una foto editable ------
+     Un enlace con data-abre="hueco" abre en pestaña nueva el
+     archivo actual de esa foto (aunque se haya cambiado en modo
+     fantasma), para poder guardarlo. */
+  document.querySelectorAll('a[data-abre]').forEach(function (a) {
+    a.addEventListener('click', function () {
+      var img = document.querySelector('[data-edit-img="' + a.getAttribute('data-abre') + '"]');
+      if (img) a.href = img.currentSrc || img.src;
+    });
+  });
+
   /* --- Formulario de contacto ------------------------------
      El mensaje se guarda en la base (tabla `mensajes`) y después se
      avisa al correo del club con una función de Supabase. Si el
