@@ -6,7 +6,12 @@ siguiente.
 
 ---
 
-## 1 · GitHub (para publicar la web)
+## ✅ 1 · GitHub (para publicar la web) — HECHO
+
+Repo: `github.com/itakadyr-bot/web` (con `escuelaapolana` de colaboradora
+para poder subir desde este ordenador). Web publicada en
+https://itakadyr-bot.github.io/web/ · Pasos originales, por si hay que
+repetirlos algún día:
 
 1. Crear una cuenta nueva de GitHub para Ítaka (por ejemplo `itakadyr`),
    con el correo itakadyr@gmail.com. **Las cuentas las creas tú**, no Claude.
@@ -21,7 +26,11 @@ siguiente.
    La web quedará en `https://<cuenta>.github.io/<repo>/` hasta que se
    apunte el dominio itakadyr.com.
 
-## 2 · Supabase (base de datos: contenido editable, mensajes, reservas)
+## 🔶 2 · Supabase — proyecto creado; falta ejecutar el SQL
+
+Proyecto: `oopyndrewijbqcryfbuj.supabase.co` (Frankfurt). La web ya está
+conectada. Lo que queda: seguir `SETUP-SUPABASE.md` pasos 1–5 (pegar el SQL
+y crear el usuario de administración). Pasos originales:
 
 1. En [supabase.com](https://supabase.com), crear una organización/proyecto
    nuevo para Ítaka (mejor con la cuenta de itakadyr@gmail.com, separado del
