@@ -71,9 +71,12 @@ create table if not exists public.imagenes_web (
   pagina text not null,
   hueco  text not null,
   url    text,
+  posicion text,  -- encuadre elegido arrastrando la foto (object-position)
   updated_at timestamptz default now(),
   primary key (pagina, hueco)
 );
+-- Si la tabla ya existía de antes sin la columna del encuadre:
+alter table public.imagenes_web add column if not exists posicion text;
 alter table public.imagenes_web enable row level security;
 
 drop policy if exists "cualquiera lee imagenes" on public.imagenes_web;

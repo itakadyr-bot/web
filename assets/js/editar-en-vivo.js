@@ -73,7 +73,7 @@
       'body.editando [data-edit]{outline:1.5px dashed rgba(0,117,196,.6);outline-offset:2px;cursor:text}' +
       'body.editando [data-edit]:hover{background:rgba(0,117,196,.08)}' +
       'body.editando [data-edit]:focus{outline:2px solid #0075c4;background:rgba(0,117,196,.06)}' +
-      'body.editando [data-edit-img]{outline:2px dashed rgba(0,117,196,.8);outline-offset:-2px;cursor:pointer}';
+      'body.editando [data-edit-img]{outline:2px dashed rgba(0,117,196,.8);outline-offset:-2px;cursor:grab;touch-action:none;-webkit-user-drag:none}';
     document.head.appendChild(css);
 
     barra = document.createElement('div');
@@ -100,9 +100,64 @@
       var enlace = e.target.closest && e.target.closest('a');
       if (enlace && !barra.contains(e.target)) e.preventDefault();
       var img = e.target.closest && e.target.closest('[data-edit-img]');
-      if (img) eligeFoto(img);
+      if (img && !arrastreReciente) eligeFoto(img);
     }, true);
+
+    /* ------------------------------------------------------------
+       ENCUADRAR UNA FOTO: arrastrarla dentro de su marco mueve qué
+       parte se ve (object-position). Un toque sin apenas movimiento
+       (menos de 6 px) sigue siendo «cambiar la foto»; a partir de
+       ahí es un arrastre y la foto sigue al dedo.
+       ------------------------------------------------------------ */
+    document.addEventListener('pointerdown', function (e) {
+      if (!editando) return;
+      var img = e.target.closest && e.target.closest('[data-edit-img]');
+      if (!img) return;
+      var pos = getComputedStyle(img).objectPosition.split(' ');
+      arrastre = {
+        el: img, x0: e.clientX, y0: e.clientY,
+        px: parseFloat(pos[0]) || 50, py: parseFloat(pos[1]) || 50,
+        movido: false
+      };
+      if (img.setPointerCapture) {
+        try { img.setPointerCapture(e.pointerId); } catch (err) { /* da igual */ }
+      }
+      e.preventDefault();
+    });
+    document.addEventListener('pointermove', function (e) {
+      if (!arrastre) return;
+      var dx = e.clientX - arrastre.x0;
+      var dy = e.clientY - arrastre.y0;
+      if (!arrastre.movido && Math.hypot(dx, dy) < 6) return;
+      arrastre.movido = true;
+      var marco = arrastre.el.getBoundingClientRect();
+      /* Arrastrar a la derecha enseña lo que quedaba por la izquierda:
+         el porcentaje baja. Por eso la resta. */
+      var nx = Math.max(0, Math.min(100, arrastre.px - dx / marco.width * 100));
+      var ny = Math.max(0, Math.min(100, arrastre.py - dy / marco.height * 100));
+      arrastre.el.style.objectPosition = nx.toFixed(1) + '% ' + ny.toFixed(1) + '%';
+    });
+    document.addEventListener('pointerup', function () {
+      if (!arrastre) return;
+      if (arrastre.movido) {
+        var el = arrastre.el;
+        var hueco = el.getAttribute('data-edit-img');
+        if (!fotos[hueco]) fotos[hueco] = { urlAntes: el.src };
+        if (!('posAntes' in fotos[hueco])) {
+          fotos[hueco].posAntes = arrastre.px + '% ' + arrastre.py + '%';
+        }
+        fotos[hueco].posicion = el.style.objectPosition;
+        aviso.textContent = 'Encuadre listo; se publica al guardar';
+        /* Que el clic que llega justo después no abra el selector. */
+        arrastreReciente = true;
+        setTimeout(function () { arrastreReciente = false; }, 0);
+      }
+      arrastre = null;
+    });
   }
+
+  var arrastre = null;
+  var arrastreReciente = false;
 
   function boton(texto, alPulsar, clase) {
     var b = document.createElement('button');
@@ -117,7 +172,7 @@
     btnEditar.hidden = enEdicion;
     btnGuardar.hidden = !enEdicion;
     btnDescartar.hidden = !enEdicion;
-    aviso.textContent = enEdicion ? 'Toca un texto o una foto' : '';
+    aviso.textContent = enEdicion ? 'Toca un texto o una foto · arrastra una foto para encuadrarla' : '';
   }
 
   /* ------------------------------------------------------------ */
@@ -136,6 +191,9 @@
       el.setAttribute('contenteditable', 'true');
       el.setAttribute('spellcheck', 'true');
     });
+    document.querySelectorAll('[data-edit-img]').forEach(function (el) {
+      el.draggable = false; /* el arrastre nativo pisaría el encuadre */
+    });
     muestra(true);
   }
 
@@ -153,7 +211,9 @@
     });
     Object.keys(fotos).forEach(function (hueco) {
       var el = document.querySelector('[data-edit-img="' + hueco + '"]');
-      if (el) el.src = fotos[hueco].urlAntes;
+      if (!el) return;
+      if (fotos[hueco].blob) el.src = fotos[hueco].urlAntes;
+      if ('posAntes' in fotos[hueco]) el.style.objectPosition = fotos[hueco].posAntes;
     });
     sal();
   }
@@ -234,9 +294,24 @@
           .then(function (r) {
             if (r.error) throw r.error;
             var publica = cliente.storage.from('imagenes').getPublicUrl(camino);
-            return { pagina: pagina, hueco: hueco, url: publica.data.publicUrl };
+            return { pagina: pagina, hueco: hueco, url: publica.data.publicUrl,
+                     posicion: foto.posicion || null };
           });
       });
+
+    /* Encuadres sin foto nueva: se guarda la dirección que ya tenía la
+       foto (tal y como está escrita en el HTML, no la absoluta, para
+       que siga valiendo cuando la web cambie de dominio). */
+    Object.keys(fotos).forEach(function (hueco) {
+      var foto = fotos[hueco];
+      if (foto.blob || !foto.posicion) return;
+      var el = document.querySelector('[data-edit-img="' + hueco + '"]');
+      if (!el) return;
+      subidas.push(Promise.resolve({
+        pagina: pagina, hueco: hueco,
+        url: el.getAttribute('src'), posicion: foto.posicion
+      }));
+    });
 
     Promise.all(subidas).then(function (filasImg) {
       var tareas = [];

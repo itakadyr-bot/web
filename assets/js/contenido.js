@@ -35,11 +35,13 @@
     })
     .catch(function (e) { console.warn('[Ítaka] contenido_web:', e.message); });
 
-  window.ITAKA.rest('imagenes_web' + filtro + '&select=hueco,url')
+  window.ITAKA.rest('imagenes_web' + filtro + '&select=hueco,url,posicion')
     .then(function (filas) {
       (filas || []).forEach(function (f) {
         var el = document.querySelector('[data-edit-img="' + f.hueco + '"]');
-        if (el && f.url) el.src = f.url;
+        if (!el) return;
+        if (f.url && f.url !== el.getAttribute('src')) el.src = f.url;
+        if (f.posicion) el.style.objectPosition = f.posicion;
       });
     })
     .catch(function (e) { console.warn('[Ítaka] imagenes_web:', e.message); });
