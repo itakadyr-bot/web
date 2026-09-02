@@ -166,12 +166,45 @@
       var archivo = entrada.files && entrada.files[0];
       if (!archivo) return;
       var hueco = el.getAttribute('data-edit-img');
-      if (!fotos[hueco]) fotos[hueco] = { urlAntes: el.src };
-      fotos[hueco].archivo = archivo;
-      el.src = URL.createObjectURL(archivo);
-      aviso.textContent = 'Foto lista; se sube al guardar';
+      aviso.textContent = 'Preparando la foto…';
+      preparaFoto(archivo).then(function (lista) {
+        if (!fotos[hueco]) fotos[hueco] = { urlAntes: el.src };
+        fotos[hueco].blob = lista.blob;
+        fotos[hueco].ext = lista.ext;
+        el.src = URL.createObjectURL(lista.blob);
+        aviso.textContent = 'Foto lista; se sube al guardar';
+      }).catch(function () {
+        /* Chrome no sabe leer los HEIC del iPhone; Safari sí. */
+        aviso.textContent = 'No puedo leer esa foto. Si es del iPhone (HEIC), ' +
+          'ábrela en Fotos y exporta como JPG, o inténtalo desde Safari.';
+      });
     });
     entrada.click();
+  }
+
+  /* Deja la foto lista para la web: si es enorme se encoge a 2000 px
+     y se recomprime. Así nadie sube 8 MB del carrete sin querer, y de
+     paso los formatos raros se convierten a JPG. Los PNG (logos con
+     transparencia) se quedan en PNG. */
+  function preparaFoto(archivo) {
+    return createImageBitmap(archivo).then(function (bmp) {
+      var MAX = 2000;
+      var esPng = archivo.type === 'image/png';
+      var escala = Math.min(1, MAX / Math.max(bmp.width, bmp.height));
+      var yaSirve = escala === 1 && archivo.size < 800 * 1024 &&
+        (esPng || archivo.type === 'image/jpeg');
+      if (yaSirve) return { blob: archivo, ext: esPng ? '.png' : '.jpg' };
+      var lienzo = document.createElement('canvas');
+      lienzo.width = Math.round(bmp.width * escala);
+      lienzo.height = Math.round(bmp.height * escala);
+      lienzo.getContext('2d').drawImage(bmp, 0, 0, lienzo.width, lienzo.height);
+      return new Promise(function (listo, mal) {
+        lienzo.toBlob(function (b) {
+          if (b) listo({ blob: b, ext: esPng ? '.png' : '.jpg' });
+          else mal(new Error('no se pudo convertir'));
+        }, esPng ? 'image/png' : 'image/jpeg', 0.85);
+      });
+    });
   }
 
   /* ------------------------------------------------------------
@@ -192,12 +225,12 @@
       }
     });
 
-    var subidas = Object.keys(fotos).filter(function (h) { return fotos[h].archivo; })
+    var subidas = Object.keys(fotos).filter(function (h) { return fotos[h].blob; })
       .map(function (hueco) {
-        var archivo = fotos[hueco].archivo;
-        var ext = (archivo.name.match(/\.[a-zA-Z0-9]+$/) || ['.jpg'])[0].toLowerCase();
-        var camino = pagina + '/' + hueco + '-' + Date.now() + ext;
-        return cliente.storage.from('imagenes').upload(camino, archivo)
+        var foto = fotos[hueco];
+        var camino = pagina + '/' + hueco + '-' + Date.now() + foto.ext;
+        return cliente.storage.from('imagenes')
+          .upload(camino, foto.blob, { contentType: foto.blob.type || 'image/jpeg' })
           .then(function (r) {
             if (r.error) throw r.error;
             var publica = cliente.storage.from('imagenes').getPublicUrl(camino);
