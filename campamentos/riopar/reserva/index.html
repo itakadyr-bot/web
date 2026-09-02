@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inscripción · San Juan de Riópar — Ítaka Deporte y Recreación</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="../../../assets/img/icono.png">
+<link rel="preconnect" href="https://oopyndrewijbqcryfbuj.supabase.co" crossorigin="">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../../../assets/css/itaka.css">
+<script src="../../../assets/js/itaka.js" defer></script>
+<script src="../../../assets/js/db.js"></script>
+<script src="../../../assets/js/editar-en-vivo.js" defer></script>
+</head>
+<body>
+<header class="cab cab--barra">
+  <div class="cab-caja">
+    <a href="../../../" class="cab-logo"><img src="../../../assets/img/logo-blanco.png" alt="Ítaka Deporte y Recreación" /></a>
+    <nav class="cab-nav" id="cab-menu">
+      <a href="../../../">Inicio</a>
+      <a href="../../" class="activo">Campamentos</a>
+      <a href="../../../servicios/">Servicios</a>
+      <a href="../../../nosotros/">Nosotros</a>
+      <a href="../../../contacto/">Contacto</a>
+      <a href="../../../contacto/" class="solo-movil">Pide presupuesto</a>
+    </nav>
+    <a href="../../../contacto/" class="cab-cta">Pide presupuesto</a>
+    <button class="cab-burger" type="button" aria-label="Abrir el menú" aria-expanded="false" aria-controls="cab-menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<main style="display:flex;flex-direction:column">
+<section style="max-width:1180px;margin:0 auto;padding:40px 24px 0;width:100%">
+  <a href="../" style="display:inline-flex;align-items:center;gap:7px;font-weight:600;font-size:14px">← Volver a la ficha de San Juan de Riópar</a>
+</section>
+<section id="reservar" style="max-width:1180px;margin:0 auto;padding:70px 24px 0;width:100%;scroll-margin-top:90px">
+  <div style="background:#fff;border:1px solid #e9edf1;border-radius:24px;padding:clamp(26px,3.5vw,38px);box-shadow:0 1px 2px rgba(11,18,27,.04),0 18px 40px -20px rgba(11,18,27,.22)">
+    <div style="font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#0075c4" data-edit="reserva-rotulo">Inscripción y reserva de plaza</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:clamp(30px,4vw,44px);line-height:1;letter-spacing:-.015em;margin:10px 0 10px" data-edit="reserva-titulo">Inscripción · San Juan de Riópar</h2>
+    <p style="font-size:16px;line-height:1.6;color:#4a5a6c;margin:0 0 22px;max-width:75ch" data-edit="reserva-intro">Rellena la ficha de inscripción y paga la señal en la página segura de Stripe: los datos de la tarjeta nunca pasan por nuestra web. La señal <strong>se descuenta del precio total</strong> y el resto se paga por transferencia, completo o fraccionado; te enviaremos las instrucciones por correo. Si el pago falla o lo dejas a medias, no se cobra nada.</p>
+
+    <div id="reserva-vuelta" hidden style="border:1px solid;border-radius:14px;padding:16px 18px;font-size:15px;line-height:1.55;margin-bottom:16px"></div>
+    <div id="reserva-cerrado" hidden style="border:1px dashed #b9c4ce;background:#f5f7f9;border-radius:14px;padding:18px 20px;font-size:15px;line-height:1.6;color:#4a5a6c">Las reservas de este campamento están <strong>cerradas</strong> ahora mismo. <a href="../../../contacto/" style="font-weight:700">Déjanos tu contacto</a> y te avisamos en cuanto se abran las plazas.</div>
+
+    <form id="form-reserva" data-campamento="riopar" style="display:flex;flex-direction:column;gap:13px">
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;margin:26px 0 4px;line-height:1">El niño o la niña</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:13px">
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Nombre<input name="nombre" required style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%"></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Primer apellido<input name="apellido1" required style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%"></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Segundo apellido<input name="apellido2" style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%"></label>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:13px">
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Año de nacimiento<input name="anyo_nacimiento" required inputmode="numeric" pattern="[0-9]{4}" placeholder="2015" style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%"></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Sexo<select name="sexo" required style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%;background:#fff"><option value="" disabled selected>Elige…</option><option>Masculino</option><option>Femenino</option></select></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Talla de camiseta<select name="talla" required style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%;background:#fff"><option value="" disabled selected>Elige…</option><option>Talla 8</option><option>Talla 10</option><option>Talla 12</option><option>Talla 14</option><option>Talla S</option><option>Talla M</option><option>Talla L</option><option>Talla XL</option></select></label>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:13px">
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">DNI (si tiene)<input name="dni" style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%"></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">SIP (tarjeta sanitaria)<input name="sip" style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%"></label>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:13px">
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">¿Viene su hermano/a también?<select name="hermano" required style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%;background:#fff"><option value="" disabled selected>Elige…</option><option>Sí</option><option>No</option></select></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">¿Es su primera vez con nosotros?<select name="primera_vez" required style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%;background:#fff"><option value="" disabled selected>Elige…</option><option>Sí</option><option>No</option></select></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">¿Grupo de 3 o más nuevos?<select name="grupo_nuevos" required style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%;background:#fff"><option value="" disabled selected>Elige…</option><option>Sí</option><option>No</option></select></label>
+      </div>
+      <p style="margin:0;font-size:13px;line-height:1.5;color:#8494a4" data-edit="reserva-nota-anyo">El año de nacimiento es muy importante para organizar bien los grupos, y la talla es orientativa para el pedido de camisetas.</p>
+
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;margin:26px 0 4px;line-height:1">Padre, madre o tutor/a</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:13px">
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Nombre y apellidos<input name="tutor" required style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%"></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">DNI<input name="tutor_dni" required style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%"></label>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:13px">
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Teléfono móvil<input name="telefono" type="tel" required style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%"></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Correo electrónico<input name="email" type="email" required style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%"></label>
+      </div>
+      <p style="margin:0;font-size:13px;line-height:1.5;color:#8494a4" data-edit="reserva-nota-whatsapp">El teléfono se añadirá al grupo informativo de WhatsApp del campamento.</p>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Dirección postal completa<textarea name="direccion" rows="2" required style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px/1.5 Barlow,sans-serif;color:#2f3d4a;width:100%"></textarea></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">¿Cómo nos has conocido?<select name="como_nos_conocio" style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%;background:#fff"><option value="" disabled selected>Elige una opción (opcional)</option><option>Escuela de Atletismo Apolana</option><option>Participante en campamentos anteriores</option><option>Por amigos o recomendación</option><option>Difusión por WhatsApp</option><option>Facebook / redes sociales</option><option>Búsqueda en internet</option><option>Otro</option></select></label>
+
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;margin:26px 0 4px;line-height:1">Salud</h3>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Alergias, intolerancias o menú especial<input name="alergias" style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px Barlow,sans-serif;color:#2f3d4a;width:100%"></label>
+      <p style="margin:0;font-size:13px;line-height:1.5;color:#8494a4" data-edit="reserva-nota-alergias">Solo en caso de necesidad real (podremos solicitar documento acreditativo), no porque no le guste algún alimento.</p>
+
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;margin:26px 0 4px;line-height:1">Autorizaciones</h3>
+      <p style="margin:0 0 8px;font-size:13px;line-height:1.55;color:#5b6b7d;max-height:120px;overflow-y:auto;border:1px solid #eef1f4;border-radius:10px;padding:10px 12px;background:#fafbfc" data-edit="reserva-rgpd">En cumplimiento del Reglamento (UE) 2016/679 (RGPD), Ítaka deporte y recreación S.L.U. le informa de que los datos personales proporcionados mediante este formulario serán recogidos en un fichero cuyo responsable es Ítaka deporte y recreación S.L.U., CIF B42617795, con domicilio a estos efectos en Calle Luís Braïlle n.º 10, 4.ºB, 03010 Alicante. Más detalle en nuestra política de privacidad.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:13px">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#3b4a5c;margin-bottom:6px" data-edit="reserva-autinfo-titulo">Envío de información de otras actividades</div>
+          <div style="display:flex;gap:18px"><label style="display:flex;gap:8px;align-items:center;font-size:14.5px;font-weight:500;color:#2f3d4a"><input type="radio" name="autoriza_info" value="Autorizo" required style="accent-color:#0075c4">Autorizo</label><label style="display:flex;gap:8px;align-items:center;font-size:14.5px;font-weight:500;color:#2f3d4a"><input type="radio" name="autoriza_info" value="No autorizo" style="accent-color:#0075c4">No autorizo</label></div>
+        </div>
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#3b4a5c;margin-bottom:6px" data-edit="reserva-autfotos-titulo">Toma de fotografías y vídeos durante las actividades</div>
+          <div style="display:flex;gap:18px"><label style="display:flex;gap:8px;align-items:center;font-size:14.5px;font-weight:500;color:#2f3d4a"><input type="radio" name="autoriza_fotos" value="Autorizo" required style="accent-color:#0075c4">Autorizo</label><label style="display:flex;gap:8px;align-items:center;font-size:14.5px;font-weight:500;color:#2f3d4a"><input type="radio" name="autoriza_fotos" value="No autorizo" style="accent-color:#0075c4">No autorizo</label></div>
+        </div>
+      </div>
+
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;margin:26px 0 4px;line-height:1">Condiciones</h3>
+      <p style="margin:0 0 8px;font-size:13px;line-height:1.55;color:#5b6b7d;max-height:120px;overflow-y:auto;border:1px solid #eef1f4;border-radius:10px;padding:10px 12px;background:#fafbfc" data-edit="reserva-cond-reserva">El pago de la señal de 150 € reserva la plaza. Te enviaremos un correo con las instrucciones para completar el pago del resto por transferencia bancaria, completo o fraccionado. La señal se descuenta del precio total del campamento.</p>
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;color:#5b6b7d;font-weight:500"><input required type="checkbox" name="acepta_reserva" style="margin-top:3px;width:17px;height:17px;accent-color:#0075c4"><span>Acepto las condiciones de reserva de plaza.</span></label>
+      <p style="margin:0 0 8px;font-size:13px;line-height:1.55;color:#5b6b7d;max-height:120px;overflow-y:auto;border:1px solid #eef1f4;border-radius:10px;padding:10px 12px;background:#fafbfc" data-edit="reserva-cond-cancelacion">Cancelación de la reserva: únicamente se procederá a la devolución de parte de lo abonado por causas médicas o familiares justificadas. Hasta el 1 de abril se devuelve lo abonado menos 100 € de reserva; hasta el 1 de mayo, menos 150 €; hasta el 1 de junio, menos 200 €; hasta el 25 de junio, menos 250 €. A partir del 26 de junio no se realizará ninguna devolución.</p>
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;color:#5b6b7d;font-weight:500"><input required type="checkbox" name="acepta_cancelacion" style="margin-top:3px;width:17px;height:17px;accent-color:#0075c4"><span>He leído, entendido y acepto las condiciones de cancelación y devolución.</span></label>
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5;color:#5b6b7d;font-weight:500"><input required type="checkbox" style="margin-top:3px;width:17px;height:17px;accent-color:#0075c4"><span>He leído y acepto la <a href="../../../legal/#privacidad">política de privacidad</a>.</span></label>
+
+      <h3 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;margin:26px 0 4px;line-height:1">Observaciones</h3>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Lo que quieras contarnos<textarea name="observaciones" rows="3" placeholder="Observaciones, o nombre y apellidos de los amigos con los que se apunta…" style="border:1px solid #d8dee4;border-radius:8px;padding:13px 14px;font:500 16px/1.5 Barlow,sans-serif;color:#2f3d4a;width:100%"></textarea></label>
+
+      <button type="submit" style="background:#0075c4;color:#fff;border:0;border-radius:999px;padding:16px;font:700 16px Barlow,sans-serif;cursor:pointer;margin-top:10px" class="hv14">Pagar la señal de 150 € con tarjeta</button>
+      <p id="reserva-aviso" style="margin:0;font-size:13.5px;line-height:1.5;color:#8494a4"></p>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer style="margin-top:86px;background:#14202e;color:#8fa3ba;font-size:14px">
+  <div style="max-width:1180px;margin:0 auto;padding:20px 24px;display:flex;flex-wrap:wrap;gap:18px;font-size:13px"><span>© 2026 Ítaka Deporte y Recreación</span><a href="../../../legal/#aviso-legal" style="color:#8fa3ba">Aviso legal</a><a href="../../../legal/#privacidad" style="color:#8fa3ba">Privacidad</a></div>
+</footer>
+<script src="../../../assets/js/reservas.js" defer></script>
+<script src="../../../assets/js/contenido.js"></script>
+</body>
+</html>
