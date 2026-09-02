@@ -24,6 +24,40 @@
     });
   }
 
+  /* --- Ampliar imágenes al tocarlas -------------------------
+     Las que llevan data-amplia (el cartel del campamento) se abren
+     a pantalla completa; otro toque, o Escape, las cierra. En modo
+     edición no: ahí tocar la foto es cambiarla. */
+  document.addEventListener('click', function (e) {
+    var img = e.target.closest && e.target.closest('img[data-amplia]');
+    if (!img || document.body.classList.contains('editando')) return;
+    var velo = document.createElement('div');
+    velo.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(11,18,27,.94);' +
+      'display:flex;align-items:center;justify-content:center;padding:24px;cursor:zoom-out;' +
+      'opacity:0;transition:opacity .2s ease';
+    var grande = document.createElement('img');
+    grande.src = img.src;
+    grande.alt = img.alt || '';
+    grande.style.cssText = 'max-width:min(92vw,720px);max-height:92vh;border-radius:12px;' +
+      'box-shadow:0 40px 90px -30px rgba(0,0,0,.8);transform:scale(.96);' +
+      'transition:transform .22s cubic-bezier(.2,.9,.3,1)';
+    velo.appendChild(grande);
+    document.body.appendChild(velo);
+    requestAnimationFrame(function () {
+      velo.style.opacity = '1';
+      grande.style.transform = 'none';
+    });
+    function cierra() {
+      velo.style.opacity = '0';
+      grande.style.transform = 'scale(.96)';
+      setTimeout(function () { velo.remove(); }, 200);
+      document.removeEventListener('keydown', tecla);
+    }
+    function tecla(ev) { if (ev.key === 'Escape') cierra(); }
+    velo.addEventListener('click', cierra);
+    document.addEventListener('keydown', tecla);
+  });
+
   /* --- Formulario de contacto ------------------------------
      El mensaje se guarda en la base (tabla `mensajes`) y después se
      avisa al correo del club con una función de Supabase. Si el
