@@ -77,7 +77,12 @@
       /* Los sombreados que van encima de las fotos de los héroes se
          comían el clic: en modo edición los clics los atraviesan,
          para poder tocar la foto de debajo. */
-      'body.editando [style*="position:absolute"][style*="gradient"]{pointer-events:none}';
+      'body.editando [style*="position:absolute"][style*="gradient"]{pointer-events:none}' +
+      '.fantasma-mango{position:absolute;transform:translateX(-100%);z-index:9998;' +
+      'background:#0075c4;color:#fff;font:700 13px Barlow,system-ui,sans-serif;' +
+      'padding:9px 15px;border-radius:999px;cursor:grab;touch-action:none;user-select:none;' +
+      'box-shadow:0 10px 26px -8px rgba(0,0,0,.5);white-space:nowrap}' +
+      '.fantasma-mango:active{cursor:grabbing}';
     document.head.appendChild(css);
 
     barra = document.createElement('div');
@@ -103,7 +108,7 @@
       if (!editando) return;
       var enlace = e.target.closest && e.target.closest('a');
       if (enlace && !barra.contains(e.target)) e.preventDefault();
-      var img = e.target.closest && e.target.closest('[data-edit-img]');
+      var img = laFotoDe(e.target);
       if (img && !arrastreReciente) eligeFoto(img);
     }, true);
 
@@ -115,7 +120,7 @@
        ------------------------------------------------------------ */
     document.addEventListener('pointerdown', function (e) {
       if (!editando) return;
-      var img = e.target.closest && e.target.closest('[data-edit-img]');
+      var img = laFotoDe(e.target);
       if (!img) return;
       var pos = getComputedStyle(img).objectPosition.split(' ');
       arrastre = {
@@ -168,7 +173,7 @@
        ------------------------------------------------------------ */
     document.addEventListener('wheel', function (e) {
       if (!editando) return;
-      var img = e.target.closest && e.target.closest('[data-edit-img]');
+      var img = laFotoDe(e.target);
       if (!img) return;
       e.preventDefault();
       var hueco = img.getAttribute('data-edit-img');
@@ -190,6 +195,45 @@
 
   var arrastre = null;
   var arrastreReciente = false;
+
+  /* ------------------------------------------------------------
+     EL ASA DE LAS FOTOS DE FONDO · Las fotos de los héroes van
+     DEBAJO del titular y de los botones, así que apenas quedaba
+     dónde tocarlas. En modo edición, cada foto de fondo recibe una
+     pastilla «📷 Foto del fondo» en su esquina: tocarla cambia la
+     foto, arrastrarla la encuadra y la rueda encima hace zoom. Todo
+     lo que se haga sobre el asa se aplica a su foto.
+     ------------------------------------------------------------ */
+  var mangos = [];
+
+  function laFotoDe(objetivo) {
+    if (!objetivo || !objetivo.closest) return null;
+    var mango = objetivo.closest('.fantasma-mango');
+    if (mango) return mango._foto;
+    return objetivo.closest('[data-edit-img]');
+  }
+
+  function pintaMangos() {
+    document.querySelectorAll('[data-edit-img]').forEach(function (img) {
+      if (getComputedStyle(img).position !== 'absolute') return;
+      var caja = img.getBoundingClientRect();
+      if (!caja.width) return;
+      var mango = document.createElement('div');
+      mango.className = 'fantasma-mango';
+      mango.textContent = '📷 Foto del fondo';
+      mango.title = 'Toca para cambiarla · arrastra para encuadrar · rueda para zoom';
+      mango.style.left = (caja.right + scrollX - 16) + 'px';
+      mango.style.top = (caja.top + scrollY + 16) + 'px';
+      mango._foto = img;
+      document.body.appendChild(mango);
+      mangos.push(mango);
+    });
+  }
+
+  function quitaMangos() {
+    mangos.forEach(function (m) { m.remove(); });
+    mangos = [];
+  }
 
   /* El zoom guardado vive en object-view-box como inset(p%):
      p = 50·(1−1/z), así que z = 50/(50−p). */
@@ -247,6 +291,7 @@
     document.querySelectorAll('[data-edit-img]').forEach(function (el) {
       el.draggable = false; /* el arrastre nativo pisaría el encuadre */
     });
+    pintaMangos();
     muestra(true);
   }
 
@@ -254,6 +299,7 @@
     editando = false;
     document.body.classList.remove('editando');
     cadaTexto(function (el) { el.removeAttribute('contenteditable'); });
+    quitaMangos();
     muestra(false);
   }
 
