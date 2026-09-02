@@ -76,7 +76,9 @@
           throw new Error('Supabase ' + r.status + ': ' + t);
         });
       }
-      return r.status === 204 ? null : r.json();
+      /* Un alta sin «devuélvemelo» responde con el cuerpo vacío:
+         eso no es un error, es un «hecho, y no hay nada que contar». */
+      return r.text().then(function (t) { return t ? JSON.parse(t) : null; });
     });
   }
 
