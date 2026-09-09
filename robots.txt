@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /acceso/
+Disallow: /admin/
+Allow: /
+
+Sitemap: https://itakarecreacion.com/sitemap.xml
