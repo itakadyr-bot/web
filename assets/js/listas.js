@@ -16,7 +16,15 @@
   var cliente = null;
   var reservas = [];
   var campamentos = {};
+  var plazosPorReserva = {};
   var filtro = 'todos';
+
+  var ESTADOS_PLAZO = {
+    'pendiente':  { texto: 'Pendiente',  clase: 'estado-pendiente' },
+    'procesando': { texto: 'Procesando (el banco tarda unos días)', clase: 'estado-efectivo' },
+    'cobrado':    { texto: 'Cobrado ✓',  clase: 'estado-pagada' },
+    'devuelto':   { texto: 'DEVUELTO ⚠', clase: 'estado-devuelto' }
+  };
 
   var avisoAcceso = document.getElementById('aviso-acceso');
   var contenido = document.getElementById('contenido');
@@ -65,11 +73,16 @@
   function carga() {
     return Promise.all([
       cliente.from('campamentos').select('id,nombre').then(sinError),
-      cliente.from('reservas').select('*').order('created_at', { ascending: false }).then(sinError)
+      cliente.from('reservas').select('*').order('created_at', { ascending: false }).then(sinError),
+      cliente.from('plazos').select('*').order('vence').then(sinError)
     ]).then(function (r) {
       campamentos = {};
       (r[0] || []).forEach(function (c) { campamentos[c.id] = c.nombre; });
       reservas = r[1] || [];
+      plazosPorReserva = {};
+      (r[2] || []).forEach(function (p) {
+        (plazosPorReserva[p.reserva_id] = plazosPorReserva[p.reserva_id] || []).push(p);
+      });
       pintaSelector();
       pinta();
     }).catch(function (e) {
@@ -152,7 +165,30 @@
       Object.keys(ETIQUETAS).forEach(function (k) {
         if (datos[k]) piezas += dato(ETIQUETAS[k], datos[k]);
       });
-      ficha.innerHTML = piezas +
+      /* --- la domiciliación y los plazos del resto ------------- */
+      var plazos = plazosPorReserva[r.id] || [];
+      var bloquePlazos = '<div class="dato" style="grid-column:1/-1;border-top:1px solid #eef1f4;padding-top:12px;margin-top:4px">' +
+        '<dt>Resto del campamento (domiciliación)</dt>';
+      bloquePlazos += r.sepa_pm
+        ? '<dd style="margin-top:4px"><span class="chip estado-pagada">🏦 Domiciliación autorizada</span></dd>'
+        : '<dd style="margin-top:4px"><span class="chip estado-pendiente">Sin autorizar</span> ' +
+          '<button class="boton-mini" data-accion="enlace-dom">🔗 Copiar enlace para la familia</button></dd>';
+      plazos.forEach(function (p) {
+        var ep = ESTADOS_PLAZO[p.estado] || { texto: p.estado, clase: 'estado-pendiente' };
+        bloquePlazos += '<dd style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">' +
+          '<strong>' + escapa(p.concepto) + '</strong> · ' +
+          (p.importe_centimos / 100).toLocaleString('es-ES') + ' € · vence ' +
+          new Date(p.vence + 'T12:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }) +
+          ' <span class="chip ' + ep.clase + '">' + ep.texto + '</span>' +
+          ((p.estado === 'pendiente' || p.estado === 'devuelto') && r.sepa_pm
+            ? ' <button class="boton-mini" data-plazo-cobrar="' + p.id + '">💶 Cobrar ahora</button>' : '') +
+          (p.estado === 'pendiente'
+            ? ' <button class="boton-mini rojo" data-plazo-borrar="' + p.id + '">Quitar</button>' : '') +
+          '</dd>';
+      });
+      bloquePlazos += '<dd style="margin-top:10px"><button class="boton-mini" data-accion="anadir-plazo">+ Añadir plazo</button></dd></div>';
+
+      ficha.innerHTML = piezas + bloquePlazos +
         '<div class="dato" style="grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">' +
         (r.estado === 'pendiente-efectivo'
           ? '<button class="boton-mini" data-accion="pagada">✓ Marcar señal pagada</button>' : '') +
@@ -162,6 +198,18 @@
         '</div>';
       ficha.querySelectorAll('button[data-accion]').forEach(function (b) {
         b.addEventListener('click', function () { accion(b.getAttribute('data-accion'), r); });
+      });
+      ficha.querySelectorAll('button[data-plazo-cobrar]').forEach(function (b) {
+        b.addEventListener('click', function () { cobra(b.getAttribute('data-plazo-cobrar'), b); });
+      });
+      ficha.querySelectorAll('button[data-plazo-borrar]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          if (!confirm('¿Quitar este plazo?')) return;
+          cliente.from('plazos').delete().eq('id', b.getAttribute('data-plazo-borrar')).then(function (res) {
+            if (res.error) return alert('No se pudo: ' + res.error.message);
+            carga();
+          });
+        });
       });
       fila.appendChild(ficha);
       lista.appendChild(fila);
@@ -188,6 +236,31 @@
   /* ------------------- acciones -------------------------------- */
 
   function accion(cual, r) {
+    if (cual === 'enlace-dom') {
+      var enlace = new URL(window.ITAKA.BASE + 'domiciliar/?r=' + r.id, location.href).href;
+      navigator.clipboard.writeText(enlace).then(function () {
+        alert('Enlace copiado. Mándaselo a la familia (WhatsApp o correo):\n\n' + enlace);
+      }, function () {
+        prompt('Copia el enlace para la familia:', enlace);
+      });
+      return;
+    }
+    if (cual === 'anadir-plazo') {
+      var concepto = prompt('Concepto del plazo (p. ej. «Resto 1/2 · abril»):');
+      if (!concepto) return;
+      var importe = parseFloat(String(prompt('Importe en euros (p. ej. 150):') || '').replace(',', '.'));
+      if (!(importe > 0)) return alert('Ese importe no vale.');
+      var vence = prompt('Fecha de cargo (AAAA-MM-DD):', new Date().toISOString().slice(0, 10));
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(vence || '')) return alert('La fecha tiene que ser AAAA-MM-DD.');
+      cliente.from('plazos').insert({
+        reserva_id: r.id, concepto: concepto.trim(),
+        importe_centimos: Math.round(importe * 100), vence: vence
+      }).then(function (res) {
+        if (res.error) return alert('No se pudo añadir: ' + res.error.message);
+        carga();
+      });
+      return;
+    }
     if (cual === 'borrar') {
       if (!confirm('¿Borrar del todo la inscripción de «' + r.participante + '»?\n\nEsto no se puede deshacer.')) return;
       cliente.from('reservas').delete().eq('id', r.id).then(function (res) {
@@ -205,21 +278,66 @@
 
   document.getElementById('btn-recargar').addEventListener('click', carga);
 
+  /* --- lanzar recibos: uno concreto, o todos los vencidos ------- */
+
+  function cobra(plazoId, boton) {
+    if (boton) boton.disabled = true;
+    cliente.auth.getSession().then(function (s) {
+      var token = s && s.data && s.data.session && s.data.session.access_token;
+      return fetch(window.ITAKA.URL + '/functions/v1/plazos-cobrar', {
+        method: 'POST',
+        headers: {
+          apikey: window.ITAKA.KEY,
+          Authorization: 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(plazoId ? { plazo: plazoId } : {})
+      });
+    }).then(function (r) { return r.json(); })
+      .then(function (d) {
+        var partes = [];
+        if (d.lanzados) partes.push(d.lanzados + ' recibo(s) lanzados (quedan «procesando» unos días)');
+        if (d.detalle) partes.push(d.detalle);
+        (d.saltados || []).forEach(function (s) { partes.push('Saltado — ' + s); });
+        (d.errores || []).forEach(function (s) { partes.push('ERROR — ' + s); });
+        if (d.mensaje) partes.push(d.mensaje);
+        alert(partes.join('\n') || 'Hecho.');
+        carga();
+      })
+      .catch(function (e) { alert('No se pudo: ' + e.message); carga(); });
+  }
+
+  var btnVencidos = document.getElementById('btn-cobrar-vencidos');
+  if (btnVencidos) {
+    btnVencidos.addEventListener('click', function () {
+      if (confirm('¿Lanzar todos los recibos pendientes que ya han vencido?')) cobra(null, btnVencidos);
+    });
+  }
+
   /* ------------------- la lista en CSV (para Excel) ------------ */
 
   document.getElementById('btn-csv').addEventListener('click', function () {
-    var columnas = ['Campamento', 'Estado', 'Fecha', 'Participante', 'Tutor/a', 'Correo', 'Teléfono', 'Señal (€)'];
+    var columnas = ['Campamento', 'Estado', 'Fecha', 'Participante', 'Tutor/a', 'Correo', 'Teléfono', 'Señal (€)',
+                    'Domiciliación', 'Resto cobrado (€)', 'Resto pendiente (€)'];
     var clavesFicha = Object.keys(ETIQUETAS);
     columnas = columnas.concat(clavesFicha.map(function (k) { return ETIQUETAS[k]; }));
 
     var lineas = [columnas];
     visibles().forEach(function (r) {
       var estado = (ESTADOS[r.estado] || { texto: r.estado }).texto;
+      var plazos = plazosPorReserva[r.id] || [];
+      var cobradoResto = plazos.filter(function (p) { return p.estado === 'cobrado'; })
+        .reduce(function (s, p) { return s + p.importe_centimos; }, 0);
+      var pendienteResto = plazos.filter(function (p) { return p.estado !== 'cobrado'; })
+        .reduce(function (s, p) { return s + p.importe_centimos; }, 0);
       var fila = [
         campamentos[r.campamento_id] || r.campamento_id, estado,
         new Date(r.created_at).toLocaleString('es-ES'),
         r.participante, r.tutor, r.email, r.telefono,
-        (r.importe_centimos / 100).toLocaleString('es-ES')
+        (r.importe_centimos / 100).toLocaleString('es-ES'),
+        r.sepa_pm ? 'Sí' : 'No',
+        (cobradoResto / 100).toLocaleString('es-ES'),
+        (pendienteResto / 100).toLocaleString('es-ES')
       ];
       var datos = r.datos || {};
       clavesFicha.forEach(function (k) { fila.push(datos[k] || ''); });

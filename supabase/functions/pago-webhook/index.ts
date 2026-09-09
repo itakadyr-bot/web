@@ -89,12 +89,106 @@ Deno.serve(async (peticion) => {
   }
 
   const evento = JSON.parse(cuerpo);
+
+  // ---------------------------------------------------------------
+  // Resultado de un recibo SEPA (los plazos del resto): el banco ha
+  // contestado. Se apunta en el plazo y se avisa al club.
+  // ---------------------------------------------------------------
+  if (evento.type === "payment_intent.succeeded" || evento.type === "payment_intent.payment_failed") {
+    const pi = evento.data?.object ?? {};
+    const plazoId = pi.metadata?.plazo_id ?? "";
+    if (!/^[0-9a-f-]{36}$/.test(plazoId)) {
+      // sin plazo detrás (p. ej. el pago de una señal con tarjeta): no es asunto de este bloque
+      return new Response(JSON.stringify({ ignorado: "sin plazo" }), { status: 200 });
+    }
+    const cobrado = evento.type === "payment_intent.succeeded";
+    const marca = await base(
+      `plazos?id=eq.${plazoId}&select=*`,
+      { method: "PATCH", headers: { Prefer: "return=representation" },
+        body: JSON.stringify({ estado: cobrado ? "cobrado" : "devuelto" }) },
+    );
+    const plazo = marca.ok && marca.datos && marca.datos[0];
+    if (plazo && RESEND_KEY && !plazo.aviso_enviado) {
+      const rr = await base(`reservas?id=eq.${plazo.reserva_id}&select=participante,campamento_id,email,telefono`);
+      const reserva = (rr.ok && rr.datos && rr.datos[0]) || {};
+      const asunto = cobrado
+        ? `✅ Recibo cobrado: ${reserva.participante ?? "?"} · ${plazo.concepto}`
+        : `⚠️ Recibo DEVUELTO: ${reserva.participante ?? "?"} · ${plazo.concepto}`;
+      const html = `
+        <h2 style="margin:0 0 12px">${cobrado ? "✅ Recibo cobrado" : "⚠️ Recibo devuelto"}</h2>
+        <p><b>Participante:</b> ${limpio(reserva.participante)} (${limpio(reserva.campamento_id)})<br>
+           <b>Concepto:</b> ${limpio(plazo.concepto)}<br>
+           <b>Importe:</b> ${(plazo.importe_centimos / 100).toFixed(2)} €</p>
+        ${cobrado ? "" : `<p style="background:#fdf6e7;border:1px solid #ecd9a8;border-radius:8px;padding:10px 14px">
+        El banco ha devuelto el recibo. Contactad con la familia
+        (${limpio(reserva.email)} · ${limpio(reserva.telefono) || "sin teléfono"}) y,
+        cuando toque reintentarlo, botón «Cobrar ahora» en el panel de listas.</p>`}`;
+      const envio = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${RESEND_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from: "Web de Ítaka <onboarding@resend.dev>",
+          to: [DESTINO],
+          reply_to: reserva.email || undefined,
+          subject: asunto,
+          html,
+        }),
+      });
+      if (envio.ok) {
+        await base(`plazos?id=eq.${plazoId}`, {
+          method: "PATCH", body: JSON.stringify({ aviso_enviado: true }),
+        });
+      }
+    }
+    return new Response(JSON.stringify({ hecho: true }), { status: 200 });
+  }
+
   if (evento.type !== "checkout.session.completed") {
     return new Response(JSON.stringify({ ignorado: evento.type }), { status: 200 });
   }
 
   const sesion = evento.data?.object ?? {};
   const reservaId = sesion.metadata?.reserva_id ?? "";
+
+  // ---------------------------------------------------------------
+  // Autorización de domiciliación completada (sesión en modo setup):
+  // se guarda el mandato en la reserva y se avisa al club.
+  // ---------------------------------------------------------------
+  if (sesion.mode === "setup") {
+    if (!/^[0-9a-f-]{36}$/.test(reservaId) || !sesion.setup_intent) {
+      return new Response(JSON.stringify({ ignorado: "setup sin reserva" }), { status: 200 });
+    }
+    const rSI = await fetch(`https://api.stripe.com/v1/setup_intents/${sesion.setup_intent}`, {
+      headers: { Authorization: `Bearer ${Deno.env.get("STRIPE_SECRET_KEY") ?? ""}` },
+    });
+    const si = await rSI.json();
+    if (!rSI.ok || !si.payment_method) {
+      console.error("No se pudo leer el setup_intent:", si);
+      return new Response(JSON.stringify({ error: "setup ilegible" }), { status: 200 });
+    }
+    const marca = await base(
+      `reservas?id=eq.${reservaId}&select=participante,campamento_id,email`,
+      { method: "PATCH", headers: { Prefer: "return=representation" },
+        body: JSON.stringify({ sepa_pm: si.payment_method, stripe_customer_id: sesion.customer }) },
+    );
+    const reserva = marca.ok && marca.datos && marca.datos[0];
+    if (reserva && RESEND_KEY) {
+      await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${RESEND_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from: "Web de Ítaka <onboarding@resend.dev>",
+          to: [DESTINO],
+          reply_to: reserva.email || undefined,
+          subject: `🏦 Domiciliación autorizada: ${reserva.participante} · ${reserva.campamento_id}`,
+          html: `<p><b>${limpio(reserva.participante)}</b> (${limpio(reserva.campamento_id)}) ya tiene la
+            domiciliación del resto autorizada. Añadid sus plazos en el panel de listas
+            y se cobrarán desde allí.</p>`,
+        }),
+      }).catch(() => {});
+    }
+    return new Response(JSON.stringify({ hecho: true }), { status: 200 });
+  }
   if (!/^[0-9a-f-]{36}$/.test(reservaId) || sesion.payment_status !== "paid") {
     return new Response(JSON.stringify({ ignorado: "sin reserva o sin pagar" }), { status: 200 });
   }

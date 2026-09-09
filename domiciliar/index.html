@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Domiciliar el resto — Ítaka Deporte y Recreación</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="../assets/img/icono.png">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../assets/css/itaka.css">
+</head>
+<body style="min-height:100vh;display:flex;flex-direction:column;background:#0b121b">
+
+<main style="margin:auto;width:100%;max-width:480px;padding:24px">
+  <a href="../" style="display:flex;justify-content:center;margin-bottom:26px"><img src="../assets/img/logo-blanco.png" alt="Ítaka Deporte y Recreación" style="height:52px;width:auto"></a>
+  <div style="background:#fff;border-radius:24px;padding:30px 28px;display:flex;flex-direction:column;gap:14px;box-shadow:0 30px 70px -30px rgba(0,0,0,.7)">
+    <h1 style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:30px;margin:0;line-height:1.05">Domiciliar el resto del campamento</h1>
+
+    <div id="dom-vuelta" hidden style="border:1px solid;border-radius:14px;padding:14px 16px;font-size:14.5px;line-height:1.55"></div>
+
+    <div id="dom-cuerpo">
+      <p style="margin:0 0 10px;font-size:15px;line-height:1.6;color:#4a5a6c">La señal ya está pagada. El resto se paga en plazos, y lo más cómodo es <strong>domiciliarlos</strong>: autorizas el cargo en tu cuenta una sola vez y cada plazo se carga solo en su fecha. Sin transferencias ni justificantes.</p>
+      <p style="margin:0 0 10px;font-size:15px;line-height:1.6;color:#4a5a6c">El IBAN se introduce en la <strong>página segura de Stripe</strong>: nunca pasa por nuestra web. Te avisará tu banco de cada cargo, como con cualquier recibo.</p>
+      <p style="margin:0 0 16px;font-size:13.5px;line-height:1.55;color:#8494a4">Las fechas e importes de los plazos son los comunicados en la inscripción. Cualquier duda: 604 93 59 85.</p>
+      <button id="dom-boton" type="button" style="width:100%;background:#0075c4;color:#fff;border:0;border-radius:999px;padding:16px;font:700 16px Barlow,sans-serif;cursor:pointer" class="hv14">Autorizar la domiciliación</button>
+      <p id="dom-aviso" style="margin:10px 0 0;font-size:13.5px;line-height:1.5;color:#8494a4"></p>
+    </div>
+  </div>
+</main>
+
+<script src="../assets/js/db.js"></script>
+<script>
+(function () {
+  'use strict';
+  var reserva = new URLSearchParams(location.search).get('r') || '';
+  var vuelta = new URLSearchParams(location.search).get('dom') || '';
+  var caja = document.getElementById('dom-vuelta');
+  var cuerpo = document.getElementById('dom-cuerpo');
+  var boton = document.getElementById('dom-boton');
+  var aviso = document.getElementById('dom-aviso');
+
+  function mensaje(html, verde) {
+    caja.hidden = false;
+    caja.style.background = verde ? '#eef8ee' : '#fdf6e7';
+    caja.style.borderColor = verde ? '#bfe3bf' : '#ecd9a8';
+    caja.innerHTML = html;
+  }
+
+  if (vuelta === 'ok') {
+    mensaje('<strong>¡Domiciliación autorizada!</strong> Los plazos se cargarán solos en su fecha; tu banco te avisará de cada uno. No tienes que hacer nada más. 🎉', true);
+    cuerpo.hidden = true;
+    return;
+  }
+  if (vuelta === 'ko') {
+    mensaje('<strong>No se completó la autorización</strong> — no pasa nada, no se ha hecho ningún cargo. Puedes intentarlo otra vez abajo, o llamarnos y lo hacemos juntos.', false);
+  }
+  if (!reserva) {
+    mensaje('Este enlace está incompleto. Escríbenos a itakadyr@gmail.com o al 604 93 59 85 y te mandamos uno bueno.', false);
+    cuerpo.hidden = true;
+    return;
+  }
+
+  boton.addEventListener('click', function () {
+    boton.disabled = true;
+    aviso.textContent = 'Abriendo la página segura…';
+    fetch(window.ITAKA.URL + '/functions/v1/domiciliar-crear', {
+      method: 'POST',
+      headers: {
+        apikey: window.ITAKA.KEY,
+        Authorization: 'Bearer ' + window.ITAKA.KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ reserva: reserva })
+    }).then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (r) {
+        if (r.ok && r.d.url) { location.href = r.d.url; return; }
+        if (r.ok && r.d.ya_autorizada) {
+          mensaje('<strong>Esta domiciliación ya estaba autorizada.</strong> No hay que hacer nada más.', true);
+          cuerpo.hidden = true;
+          return;
+        }
+        boton.disabled = false;
+        aviso.style.color = '#b45309';
+        aviso.textContent = (r.d && r.d.mensaje) || 'No se pudo abrir. Prueba en un momento o llámanos.';
+      })
+      .catch(function () {
+        boton.disabled = false;
+        aviso.style.color = '#b45309';
+        aviso.textContent = 'No se pudo abrir. Prueba en un momento o llámanos.';
+      });
+  });
+})();
+</script>
+</body>
+</html>

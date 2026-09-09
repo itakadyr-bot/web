@@ -234,6 +234,52 @@ update public.campamentos set activo = false;              -- todos
 -- y para abrirlas: set activo = true
 ```
 
+## 9. Domiciliación del resto del campamento (SEPA)
+
+La familia autoriza una sola vez el cargo en su cuenta (IBAN, en la página
+segura de Stripe) y los plazos del resto se cobran desde el panel de listas,
+a ~0,35 € el recibo. Cada plazo vive en su fila, con su estado: pendiente →
+procesando → cobrado (o devuelto).
+
+```sql
+alter table public.reservas add column if not exists stripe_customer_id text;
+alter table public.reservas add column if not exists sepa_pm text;
+
+create table if not exists public.plazos (
+  id uuid primary key default gen_random_uuid(),
+  reserva_id uuid not null references public.reservas(id) on delete cascade,
+  concepto text not null,
+  importe_centimos integer not null check (importe_centimos > 0),
+  vence date not null,
+  estado text not null default 'pendiente',
+  stripe_payment_intent text,
+  aviso_enviado boolean default false,
+  created_at timestamptz default now()
+);
+alter table public.plazos enable row level security;
+
+drop policy if exists "admin gestiona plazos" on public.plazos;
+create policy "admin gestiona plazos" on public.plazos
+for all to authenticated using (public.es_admin()) with check (public.es_admin());
+```
+
+## 10. Las funciones de la domiciliación
+
+1. Desplegar por el editor (como siempre, nombres exactos):
+   - `domiciliar-crear` — abre la autorización del IBAN (verificación JWT
+     normal, como viene).
+   - `plazos-cobrar` — lanza los recibos (verificación JWT normal; además
+     comprueba por dentro que quien llama es administración).
+2. RE-pegar `pago-webhook` con la versión nueva (aprende a apuntar la
+   autorización SEPA y el resultado de cada recibo).
+3. En Stripe → Webhooks → vuestro destino → **añadir dos eventos** a los que
+   escucha: `payment_intent.succeeded` y `payment_intent.payment_failed`
+   (sin quitar el `checkout.session.completed` que ya tiene).
+
+Para probar sin banco de verdad: IBAN de pruebas `AT61 1904 3002 3457 3201`
+(cualquier nombre y correo). El recibo tarda unos minutos en pasar de
+«procesando» a «cobrado» en modo prueba.
+
 ## 8. Las funciones de Stripe (cuando esté la clave)
 
 1. Stripe → **Developers → API keys** → copia la **Secret key** de PRUEBA

@@ -212,7 +212,9 @@ Deno.serve(async (peticion) => {
   // La sesión de pago de Stripe: la señal, con las vueltas a la ficha.
   const p = new URLSearchParams();
   p.set("mode", "payment");
-  p.set("success_url", `${URL_BASE}campamentos/${camp.id}/reserva/?reserva=ok`);
+  // La vuelta lleva el número de reserva: así, nada más pagar la señal,
+  // se le puede ofrecer domiciliar el resto sin pedirle nada más.
+  p.set("success_url", `${URL_BASE}campamentos/${camp.id}/reserva/?reserva=ok&r=${reserva.id}`);
   p.set("cancel_url", `${URL_BASE}campamentos/${camp.id}/reserva/?reserva=ko`);
   p.set("customer_email", email);
   p.set("line_items[0][quantity]", "1");

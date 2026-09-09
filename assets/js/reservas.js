@@ -37,8 +37,20 @@
         caja.style.background = '#eef8ee';
         caja.style.borderColor = '#bfe3bf';
         caja.innerHTML = '<strong>¡Plaza reservada!</strong> Hemos recibido tu señal y ' +
-          'la ficha de inscripción. En 24-48 horas laborables te enviaremos un correo ' +
-          'con las instrucciones para el resto del pago.';
+          'la ficha de inscripción. Queda el resto del campamento: lo más cómodo es ' +
+          'domiciliarlo ahora (2 minutos) y los plazos se cargan solos en su fecha.';
+        /* el número de reserva vuelve de Stripe: con él se puede
+           autorizar la domiciliación del resto sin pedir nada más */
+        var idReserva = new URLSearchParams(location.search).get('r');
+        if (idReserva && window.ITAKA) {
+          var enlace = document.createElement('a');
+          enlace.href = window.ITAKA.BASE + 'domiciliar/?r=' + encodeURIComponent(idReserva);
+          enlace.textContent = '🏦 Domiciliar el resto ahora';
+          enlace.style.cssText = 'display:inline-block;margin-top:12px;background:#0075c4;' +
+            'color:#fff;font-weight:700;font-size:15px;padding:13px 24px;border-radius:999px';
+          enlace.className = 'hv14';
+          caja.appendChild(enlace);
+        }
       } else {
         /* Ámbar, no rojo: un pago que se queda a medias no es una
            emergencia. Y lo primero, quitar el miedo. */
