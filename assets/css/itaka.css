@@ -8,6 +8,11 @@
    ============================================================ */
 
 * { box-sizing: border-box; }
+/* Lo marcado como hidden se esconde SIEMPRE, aunque el elemento
+   lleve un display en línea (sin esto, un style="display:flex"
+   le gana al atributo y p. ej. el formulario de reserva seguía
+   a la vista con las inscripciones cerradas). */
+[hidden] { display: none !important; }
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
@@ -303,6 +308,11 @@ img { max-width: 100%; }
     backdrop-filter: none;
   }
   .cab-sub::before { display: none; }
+  /* La regla de hover de escritorio (translateX(-50%)) gana por
+     especificidad y empujaba los sub-enlaces fuera de pantalla al
+     pasar el ratón con el menú móvil abierto: aquí se anula. */
+  .cab-item:hover .cab-sub,
+  .cab-item:focus-within .cab-sub { transform: none; }
   .cab-nav .cab-sub a {
     font-size: 15px;
     padding: 8px 14px;
