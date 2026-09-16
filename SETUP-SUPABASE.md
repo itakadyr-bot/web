@@ -298,3 +298,64 @@ Para probar sin banco de verdad: IBAN de pruebas `AT61 1904 3002 3457 3201`
 4. Para probar sin cobrar nada: tarjeta `4242 4242 4242 4242`, cualquier
    fecha futura y cualquier CVC. Cuando todo esté visto, se cambia la clave
    de prueba por la real (`sk_live_…`) y el webhook se recrea en modo real.
+
+## 11. Plazas a la vista y lista de espera (14 sep 2026)
+
+Dos cosas nuevas en la web: el chip de «Quedan X plazas» en las tarjetas de
+campamento, y la lista de espera («avísame al abrir») cuando un campamento
+está cerrado o completo. Hasta pegar este SQL, la web funciona igual pero
+sin chips y con el aviso de espera dando el correo de contacto.
+
+Supabase → SQL Editor → pegar TODO el bloque → Run:
+
+```sql
+-- El cupo (plazas totales) de cada campamento. Cámbialo cuando quieras.
+alter table public.campamentos add column if not exists cupo integer;
+update public.campamentos set cupo = 110 where id = 'riopar'     and cupo is null;
+update public.campamentos set cupo = 70  where id = 'palancares' and cupo is null;
+update public.campamentos set cupo = 70  where id = 'alcossebre' and cupo is null;
+
+-- Vista pública de plazas: SOLO números (cupo y libres), nunca datos
+-- de familias. Las plazas ocupadas son las señales pagadas más las
+-- pendientes de efectivo.
+create or replace view public.plazas_web as
+select c.id, c.activo, c.cupo,
+       greatest(coalesce(c.cupo, 0) - (
+         select count(*)::int from public.reservas r
+         where r.campamento_id = c.id
+           and r.estado in ('pagada', 'pendiente-efectivo')
+       ), 0) as libres
+from public.campamentos c;
+grant select on public.plazas_web to anon, authenticated;
+
+-- La lista de espera: cualquiera puede APUNTARSE, pero leerla o borrar
+-- solo administración (los correos son datos de familias).
+create table if not exists public.interesados (
+  id uuid primary key,
+  campamento_id text not null references public.campamentos(id),
+  email text not null,
+  created_at timestamptz default now()
+);
+alter table public.interesados enable row level security;
+
+drop policy if exists "apuntarse cualquiera" on public.interesados;
+create policy "apuntarse cualquiera" on public.interesados
+for insert to anon, authenticated with check (true);
+
+drop policy if exists "admin lee interesados" on public.interesados;
+create policy "admin lee interesados" on public.interesados
+for select to authenticated using (public.es_admin());
+
+drop policy if exists "admin borra interesados" on public.interesados;
+create policy "admin borra interesados" on public.interesados
+for delete to authenticated using (public.es_admin());
+```
+
+Después de esto:
+- Las tarjetas de la portada y del catálogo enseñan el chip con las plazas
+  reales (verde con hueco, ámbar con 10 o menos, «completo» sin hueco,
+  gris si las reservas están cerradas).
+- Si un campamento está cerrado o completo, la página de inscripción ofrece
+  dejar el correo, y esos correos salen en el panel de listas (/admin/),
+  abajo, con su botón de «copiar los correos» para escribirles en CCO.
+- Para cambiar un cupo: `update public.campamentos set cupo = 120 where id = 'riopar';`

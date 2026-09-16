@@ -17,6 +17,7 @@
   var reservas = [];
   var campamentos = {};
   var plazosPorReserva = {};
+  var interesados = null; /* null = la tabla aún no existe */
   var filtro = 'todos';
 
   var ESTADOS_PLAZO = {
@@ -74,7 +75,11 @@
     return Promise.all([
       cliente.from('campamentos').select('id,nombre').then(sinError),
       cliente.from('reservas').select('*').order('created_at', { ascending: false }).then(sinError),
-      cliente.from('plazos').select('*').order('vence').then(sinError)
+      cliente.from('plazos').select('*').order('vence').then(sinError),
+      /* la lista de espera puede no existir todavía (paso 11 del
+         manual): si falla, el panel sigue andando sin ella */
+      cliente.from('interesados').select('*').order('created_at', { ascending: false })
+        .then(sinError).catch(function () { return null; })
     ]).then(function (r) {
       campamentos = {};
       (r[0] || []).forEach(function (c) { campamentos[c.id] = c.nombre; });
@@ -83,6 +88,7 @@
       (r[2] || []).forEach(function (p) {
         (plazosPorReserva[p.reserva_id] = plazosPorReserva[p.reserva_id] || []).push(p);
       });
+      interesados = r[3];
       pintaSelector();
       pinta();
     }).catch(function (e) {
@@ -213,6 +219,54 @@
       });
       fila.appendChild(ficha);
       lista.appendChild(fila);
+    });
+    pintaEspera();
+  }
+
+  /* --------------- la lista de espera --------------------------
+     Correos que dejaron las familias cuando el campamento estaba
+     cerrado o completo. Se filtra con las mismas píldoras. */
+  function pintaEspera() {
+    var caja = document.getElementById('lista-espera');
+    if (!caja || interesados == null) return;
+    var filas = interesados.filter(function (i) {
+      return filtro === 'todos' || i.campamento_id === filtro;
+    });
+    caja.hidden = false;
+    caja.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:16px 20px;border-bottom:1px solid #eef1f4">' +
+      '<strong style="font-size:15.5px">⏳ Lista de espera</strong>' +
+      '<span class="chip estado-pendiente">' + filas.length + '</span>' +
+      '<span style="flex:1"></span>' +
+      (filas.length ? '<button class="boton-mini" id="btn-copiar-espera">📋 Copiar los correos</button>' : '') +
+      '</div>';
+    if (!filas.length) {
+      caja.innerHTML += '<p style="padding:16px 20px;margin:0;color:#8494a4;font-size:14px">Nadie en espera' +
+        (filtro !== 'todos' ? ' en este campamento' : '') + '.</p>';
+      return;
+    }
+    filas.forEach(function (i) {
+      var f = document.createElement('div');
+      f.style.cssText = 'display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:11px 20px;border-bottom:1px solid #f4f6f8;font-size:14px';
+      f.innerHTML = '<span style="font-weight:600">' + escapa(i.email) + '</span>' +
+        (filtro === 'todos' ? '<span style="color:#8494a4;font-size:13px">' + escapa(campamentos[i.campamento_id] || i.campamento_id) + '</span>' : '') +
+        '<span style="color:#8494a4;font-size:13px">' + fecha(i.created_at) + '</span>' +
+        '<span style="flex:1"></span>' +
+        '<button class="boton-mini rojo">Quitar</button>';
+      f.querySelector('button').addEventListener('click', function () {
+        if (!confirm('¿Quitar a ' + i.email + ' de la lista de espera?')) return;
+        cliente.from('interesados').delete().eq('id', i.id).then(function (res) {
+          if (res.error) return alert('No se pudo: ' + res.error.message);
+          carga();
+        });
+      });
+      caja.appendChild(f);
+    });
+    var btnCopiar = document.getElementById('btn-copiar-espera');
+    if (btnCopiar) btnCopiar.addEventListener('click', function () {
+      var correos = filas.map(function (i) { return i.email; }).join(', ');
+      navigator.clipboard.writeText(correos).then(function () {
+        alert('Copiados ' + filas.length + ' correos. Pégalos en CCO al escribirles.');
+      }, function () { prompt('Copia los correos:', correos); });
     });
   }
 

@@ -211,6 +211,75 @@ img { max-width: 100%; }
 }
 
 /* ------------------------------------------------------------
+   Chip de plazas de cada campamento. El texto lo pone itaka.js
+   con el dato en vivo de la base (vista plazas_web); hasta que
+   contesta, el chip va con [hidden] y no ocupa sitio.
+   ------------------------------------------------------------ */
+.plaza-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  font: 700 13px Barlow, sans-serif;
+  letter-spacing: .01em;
+  padding: 7px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.plaza-chip::before { content: "●"; font-size: 8px; }
+.plaza-chip.abiertas { background: #eaf6ef; color: #256b3f; }
+.plaza-chip.ultimas  { background: #fdf1e2; color: #a05a1c; }
+.plaza-chip.completo { background: #fdecea; color: #b42318; }
+.plaza-chip.cerrado  { background: #eef1f4; color: #5b6b7d; }
+
+/* ------------------------------------------------------------
+   La tira de «Cómo funciona la inscripción»: cuatro pasos con
+   su número y un tinte pastel suave cada uno.
+   ------------------------------------------------------------ */
+.pasos-tira {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+  gap: 14px;
+}
+.paso-caja {
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.paso-caja .paso-num {
+  align-self: flex-start;
+  font: 700 12.5px Barlow, sans-serif;
+  letter-spacing: .08em;
+  color: #fff;
+  background: #14202e;
+  border-radius: 10px;
+  padding: 5px 10px;
+}
+.paso-caja h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 1.1;
+  margin: 2px 0 0;
+  color: #14202e;
+}
+.paso-caja p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #4a5a6c;
+}
+.paso-caja.tinte1 { background: #eaf4fb; }
+.paso-caja.tinte2 { background: #eaf6ef; }
+.paso-caja.tinte3 { background: #fdf1e7; }
+.paso-caja.tinte4 { background: #14202e; }
+.paso-caja.tinte4 h3 { color: #fff; }
+.paso-caja.tinte4 p { color: #b9c6d4; }
+.paso-caja.tinte4 .paso-num { background: rgba(255, 255, 255, .16); }
+
+/* ------------------------------------------------------------
    Estados hover de los bloques con estilos en línea.
    `!important` porque un estilo en línea siempre gana a una clase:
    sin él, el hover no se vería nunca.

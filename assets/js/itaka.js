@@ -70,6 +70,36 @@
     });
   });
 
+  /* --- Chips de plazas de los campamentos -------------------
+     Los huecos <span data-plazas="riopar"> se rellenan con el
+     dato en vivo de la vista plazas_web (solo números, nunca
+     datos de familias). Si la vista aún no existe o la base no
+     contesta, los chips se quedan escondidos y no molestan. */
+  var chips = document.querySelectorAll('[data-plazas]');
+  if (chips.length && window.ITAKA) {
+    window.ITAKA.rest('plazas_web?select=id,activo,cupo,libres').then(function (filas) {
+      var porId = {};
+      (filas || []).forEach(function (f) { porId[f.id] = f; });
+      chips.forEach(function (chip) {
+        var f = porId[chip.getAttribute('data-plazas')];
+        if (!f || f.cupo == null) return;
+        var clase, texto;
+        if (!f.activo) {
+          clase = 'cerrado'; texto = 'Inscripciones cerradas';
+        } else if (f.libres <= 0) {
+          clase = 'completo'; texto = 'Completo · lista de espera';
+        } else if (f.libres <= 10) {
+          clase = 'ultimas'; texto = '¡Últimas ' + f.libres + ' plazas!';
+        } else {
+          clase = 'abiertas'; texto = 'Quedan ' + f.libres + ' plazas';
+        }
+        chip.classList.add('plaza-chip', clase);
+        chip.textContent = texto;
+        chip.hidden = false;
+      });
+    }).catch(function () { /* sin dato, sin chip */ });
+  }
+
   /* --- Formulario de contacto ------------------------------
      El mensaje se guarda en la base (tabla `mensajes`) y después se
      avisa al correo del club con una función de Supabase. Si el

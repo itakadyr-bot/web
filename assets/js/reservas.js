@@ -73,14 +73,81 @@
       if (!camp.activo) {
         form.hidden = true;
         var cerrado = document.getElementById('reserva-cerrado');
-        if (cerrado) cerrado.hidden = false;
-      } else if (camp.senal_centimos) {
-        /* que el botón diga siempre el importe de verdad */
-        var importe = (camp.senal_centimos / 100).toLocaleString('es-ES') + ' €';
-        boton.textContent = 'Pagar la señal de ' + importe + ' con tarjeta';
+        if (cerrado) {
+          cerrado.hidden = false;
+          montaListaEspera(cerrado);
+        }
+      } else {
+        if (camp.senal_centimos) {
+          /* que el botón diga siempre el importe de verdad */
+          var importe = (camp.senal_centimos / 100).toLocaleString('es-ES') + ' €';
+          boton.textContent = 'Pagar la señal de ' + importe + ' con tarjeta';
+        }
+        /* abierto pero ¿queda sitio? si el cupo está definido y no
+           quedan plazas, se cierra igual y se ofrece la espera */
+        window.ITAKA.rest('plazas_web?id=eq.' + campamento + '&select=cupo,libres')
+          .then(function (pf) {
+            var p = pf && pf[0];
+            if (!p || p.cupo == null || p.libres > 0) return;
+            form.hidden = true;
+            var lleno = document.getElementById('reserva-cerrado');
+            if (lleno) {
+              lleno.innerHTML = 'Este campamento está <strong>completo</strong>. Déjanos tu correo ' +
+                'y te avisamos si queda una plaza libre o abrimos más.';
+              lleno.hidden = false;
+              montaListaEspera(lleno);
+            }
+          }).catch(function () { /* sin vista todavía: no se cierra nada */ });
       }
     })
     .catch(function () { /* si la base no contesta, el formulario sigue */ });
+
+  /* --- Lista de espera cuando está cerrado ---------------------
+     Dentro del aviso de «reservas cerradas» se ofrece dejar el
+     correo. Se guarda en la tabla `interesados` (solo se puede
+     ESCRIBIR desde fuera; leerla, únicamente administración) y
+     aparece en el panel de listas. Si la tabla aún no existe,
+     el formulario avisa con el contacto de siempre. */
+  function montaListaEspera(caja) {
+    if (document.getElementById('espera-form')) return;
+    var bloque = document.createElement('form');
+    bloque.id = 'espera-form';
+    bloque.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-top:12px';
+    bloque.innerHTML =
+      '<input type="email" required placeholder="tu@correo.com" autocomplete="email" ' +
+      'style="flex:1;min-width:200px;border:1px solid #d8dee4;border-radius:999px;' +
+      'padding:11px 16px;font:500 15px Barlow,sans-serif;color:#2f3d4a">' +
+      '<button type="submit" style="background:#0075c4;color:#fff;border:0;border-radius:999px;' +
+      'padding:11px 22px;font:700 14.5px Barlow,sans-serif;cursor:pointer" class="hv14">Avísame al abrir</button>' +
+      '<span id="espera-aviso" style="flex-basis:100%;font-size:13.5px;color:#8494a4"></span>';
+    caja.appendChild(bloque);
+
+    bloque.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var correo = bloque.querySelector('input').value.trim();
+      var avisoEspera = document.getElementById('espera-aviso');
+      var botonEspera = bloque.querySelector('button');
+      botonEspera.disabled = true;
+      avisoEspera.textContent = 'Apuntando…';
+      window.ITAKA.rest('interesados', {
+        method: 'POST',
+        body: {
+          id: (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : undefined,
+          campamento_id: campamento,
+          email: correo
+        }
+      }).then(function () {
+        bloque.querySelector('input').hidden = true;
+        botonEspera.hidden = true;
+        avisoEspera.style.color = '#256b3f';
+        avisoEspera.textContent = '¡Apuntado! Te escribiremos a ' + correo + ' en cuanto se abran las plazas.';
+      }).catch(function () {
+        botonEspera.disabled = false;
+        avisoEspera.style.color = '#b45309';
+        avisoEspera.textContent = 'No se pudo apuntar ahora mismo. Escríbenos a itakadyr@gmail.com y te avisamos igual.';
+      });
+    });
+  }
 
   /* --- El botón dice lo que va a pasar según el modo de pago --- */
   var textoTarjeta = boton.textContent;
