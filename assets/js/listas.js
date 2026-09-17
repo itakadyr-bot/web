@@ -75,7 +75,9 @@
     return Promise.all([
       cliente.from('campamentos').select('id,nombre').then(sinError),
       cliente.from('reservas').select('*').order('created_at', { ascending: false }).then(sinError),
-      cliente.from('plazos').select('*').order('vence').then(sinError),
+      /* los plazos SEPA pueden no existir todavía (paso 9 del manual) */
+      cliente.from('plazos').select('*').order('vence')
+        .then(sinError).catch(function () { return []; }),
       /* la lista de espera puede no existir todavía (paso 11 del
          manual): si falla, el panel sigue andando sin ella */
       cliente.from('interesados').select('*').order('created_at', { ascending: false })
