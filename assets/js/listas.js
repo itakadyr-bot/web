@@ -19,6 +19,7 @@
   var plazosPorReserva = {};
   var interesados = null; /* null = la tabla aún no existe */
   var filtro = 'todos';
+  var filtroPago = 'todos';
 
   var ESTADOS_PLAZO = {
     'pendiente':  { texto: 'Pendiente',  clase: 'estado-pendiente' },
@@ -119,11 +120,59 @@
       b.addEventListener('click', function () { filtro = par[0]; pintaSelector(); pinta(); });
       caja.appendChild(b);
     });
+    pintaSelectorPago();
+  }
+
+  /* --------------- filtro por estado de los pagos --------------- */
+  function pintaSelectorPago() {
+    var caja = document.getElementById('selector-pago');
+    if (!caja) return;
+    caja.innerHTML = '';
+    [['todos', 'Todos los pagos'],
+     ['completo', '✓ Todo pagado'],
+     ['parcial', 'A medias'],
+     ['devuelto', '⚠ Devueltos'],
+     ['sinplazos', 'Sin plazos'],
+     ['senal', 'Señal pendiente']].forEach(function (par) {
+      var b = document.createElement('button');
+      b.className = 'pildora' + (filtroPago === par[0] ? ' activa' : '');
+      b.style.fontSize = '13px';
+      b.style.padding = '8px 16px';
+      b.textContent = par[1];
+      b.addEventListener('click', function () { filtroPago = par[0]; pintaSelectorPago(); pinta(); });
+      caja.appendChild(b);
+    });
+  }
+
+  /* --------------- el resumen de pagos de una reserva -----------
+     Cuenta la señal como pago 1 (igual que los conceptos «Pago 2/3»):
+     una familia con señal pagada y un plazo cobrado de dos va «2/3». */
+  function resumenPago(r) {
+    var plazos = plazosPorReserva[r.id] || [];
+    var total = 1 + plazos.length;
+    var pagados = (r.estado === 'pagada' ? 1 : 0) +
+      plazos.filter(function (p) { return p.estado === 'cobrado'; }).length;
+    var devuelto = plazos.some(function (p) { return p.estado === 'devuelto'; });
+
+    if (r.estado !== 'pagada') {
+      return { cat: 'senal', texto: null }; /* el chip de estado ya lo dice */
+    }
+    if (devuelto) {
+      return { cat: 'devuelto', clase: 'estado-devuelto', texto: '⚠ Devuelto · ' + pagados + '/' + total };
+    }
+    if (!plazos.length) {
+      return { cat: 'sinplazos', clase: 'estado-pendiente', texto: r.sepa_pm ? 'Domiciliado · sin plazos' : 'Sin plazos aún' };
+    }
+    if (pagados === total) {
+      return { cat: 'completo', clase: 'estado-pagada', texto: '✓ Todo pagado · ' + pagados + '/' + total };
+    }
+    return { cat: 'parcial', clase: 'estado-efectivo', texto: 'Pagados ' + pagados + '/' + total };
   }
 
   function visibles() {
     return reservas.filter(function (r) {
-      return filtro === 'todos' || r.campamento_id === filtro;
+      if (filtro !== 'todos' && r.campamento_id !== filtro) return false;
+      return filtroPago === 'todos' || resumenPago(r).cat === filtroPago;
     });
   }
 
@@ -154,9 +203,11 @@
 
       var cab = document.createElement('div');
       cab.className = 'fila-cab';
+      var pago = resumenPago(r);
       cab.innerHTML =
         '<strong style="font-size:15.5px">' + escapa(r.participante) + '</strong>' +
         '<span class="chip ' + estado.clase + '">' + estado.texto + '</span>' +
+        (pago.texto ? '<span class="chip ' + pago.clase + '">' + pago.texto + '</span>' : '') +
         (filtro === 'todos' ? '<span style="font-size:13.5px;color:#8494a4">' + escapa(campamentos[r.campamento_id] || r.campamento_id) + '</span>' : '') +
         '<span style="font-size:13.5px;color:#8494a4">' + fecha(r.created_at) + '</span>' +
         '<span style="flex:1"></span>' +
@@ -373,7 +424,7 @@
   /* ------------------- la lista en CSV (para Excel) ------------ */
 
   document.getElementById('btn-csv').addEventListener('click', function () {
-    var columnas = ['Campamento', 'Estado', 'Fecha', 'Participante', 'Tutor/a', 'Correo', 'Teléfono', 'Señal (€)',
+    var columnas = ['Campamento', 'Estado', 'Pagos', 'Fecha', 'Participante', 'Tutor/a', 'Correo', 'Teléfono', 'Señal (€)',
                     'Domiciliación', 'Resto cobrado (€)', 'Resto pendiente (€)'];
     var clavesFicha = Object.keys(ETIQUETAS);
     columnas = columnas.concat(clavesFicha.map(function (k) { return ETIQUETAS[k]; }));
@@ -388,6 +439,7 @@
         .reduce(function (s, p) { return s + p.importe_centimos; }, 0);
       var fila = [
         campamentos[r.campamento_id] || r.campamento_id, estado,
+        resumenPago(r).texto || 'Señal pendiente',
         new Date(r.created_at).toLocaleString('es-ES'),
         r.participante, r.tutor, r.email, r.telefono,
         (r.importe_centimos / 100).toLocaleString('es-ES'),
