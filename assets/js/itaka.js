@@ -70,6 +70,18 @@
     });
   });
 
+  /* --- La barra sobre el héroe -------------------------------
+     En las páginas con foto arriba, la cabecera va transparente
+     y se vuelve de cristal oscuro al bajar. */
+  var barraHeroe = document.querySelector('.cab--heroe');
+  if (barraHeroe) {
+    var ajustaBarra = function () {
+      barraHeroe.classList.toggle('pegada', window.scrollY > 24);
+    };
+    window.addEventListener('scroll', ajustaBarra, { passive: true });
+    ajustaBarra();
+  }
+
   /* --- Chips de plazas de los campamentos -------------------
      Los huecos <span data-plazas="riopar"> se rellenan con el
      dato en vivo de la vista plazas_web (solo números, nunca

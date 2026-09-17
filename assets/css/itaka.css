@@ -51,6 +51,26 @@ img { max-width: 100%; }
   backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(255, 255, 255, .1);
 }
+/* En las páginas con foto de héroe, la barra flota transparente
+   encima de la foto (el degradado del héroe ya la hace legible) y
+   solo al bajar se convierte en el cristal oscuro. Así arriba no
+   se apilan dos negros. itaka.js le pone .pegada con el scroll. */
+.cab--heroe {
+  position: fixed;
+  left: 0;
+  right: 0;
+  background: transparent;
+  border-bottom-color: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transition: background .25s ease, border-color .25s ease, backdrop-filter .25s ease;
+}
+.cab--heroe.pegada {
+  background: rgba(11, 18, 27, .92);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-bottom-color: rgba(255, 255, 255, .1);
+}
 .cab-caja {
   max-width: 1240px;
   margin: 0 auto;
