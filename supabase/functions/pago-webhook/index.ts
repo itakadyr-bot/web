@@ -127,7 +127,7 @@ Deno.serve(async (peticion) => {
         method: "POST",
         headers: { Authorization: `Bearer ${RESEND_KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          from: "Web de Ítaka <onboarding@resend.dev>",
+          from: "Ítaka Deporte y Recreación <info@itakarecreacion.com>",
           to: [DESTINO],
           reply_to: reserva.email || undefined,
           subject: asunto,
@@ -177,7 +177,7 @@ Deno.serve(async (peticion) => {
         method: "POST",
         headers: { Authorization: `Bearer ${RESEND_KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          from: "Web de Ítaka <onboarding@resend.dev>",
+          from: "Ítaka Deporte y Recreación <info@itakarecreacion.com>",
           to: [DESTINO],
           reply_to: reserva.email || undefined,
           subject: `🏦 Domiciliación autorizada: ${reserva.participante} · ${reserva.campamento_id}`,
@@ -240,7 +240,7 @@ Deno.serve(async (peticion) => {
       method: "POST",
       headers: { Authorization: `Bearer ${RESEND_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: "Web de Ítaka <onboarding@resend.dev>",
+        from: "Ítaka Deporte y Recreación <info@itakarecreacion.com>",
         to: [DESTINO],
         reply_to: reserva.email || undefined,
         subject: `Señal pagada: ${reserva.participante} · ${nombreCamp}`,

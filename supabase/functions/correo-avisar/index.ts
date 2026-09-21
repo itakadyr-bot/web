@@ -97,7 +97,7 @@ Deno.serve(async (peticion) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Web de Ítaka <onboarding@resend.dev>",
+      from: "Ítaka Deporte y Recreación <info@itakarecreacion.com>",
       to: [DESTINO],
       reply_to: m.email || undefined,
       subject: asunto,

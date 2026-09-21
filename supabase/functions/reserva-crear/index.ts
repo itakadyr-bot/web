@@ -191,7 +191,7 @@ Deno.serve(async (peticion) => {
         method: "POST",
         headers: { Authorization: `Bearer ${RESEND_KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          from: "Web de Ítaka <onboarding@resend.dev>",
+          from: "Ítaka Deporte y Recreación <info@itakarecreacion.com>",
           to: [DESTINO],
           reply_to: email,
           subject: `Señal EN EFECTIVO pendiente: ${participante} · ${camp.nombre}`,
