@@ -81,7 +81,7 @@ Deno.serve(async (peticion) => {
 
   const asunto = `Mensaje de la web: ${m.nombre || "sin nombre"} · ${m.interes || "consulta"}`;
   const html = `
-    <h2 style="margin:0 0 12px">Nuevo mensaje desde itakadyr.com</h2>
+    <h2 style="margin:0 0 12px">Nuevo mensaje desde itakarecreacion.com</h2>
     <p><b>Nombre:</b> ${limpio(m.nombre)}<br>
        <b>Correo:</b> ${limpio(m.email)}<br>
        <b>Teléfono:</b> ${limpio(m.telefono) || "—"}<br>
