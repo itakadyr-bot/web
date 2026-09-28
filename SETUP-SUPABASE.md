@@ -359,3 +359,92 @@ Después de esto:
   dejar el correo, y esos correos salen en el panel de listas (/admin/),
   abajo, con su botón de «copiar los correos» para escribirles en CCO.
 - Para cambiar un cupo: `update public.campamentos set cupo = 120 where id = 'riopar';`
+
+## 12. Freno anti-spam del formulario de contacto (28 sep 2026)
+
+Un bot estaba rellenando el formulario con texto aleatorio. Tres capas:
+la trampa invisible del formulario (ya en la web), y en la base un freno
+por IP más un detector de galimatías. PRINCIPIO: fallar en abierto —
+antes dejar pasar a un bot un día que bloquear a una familia.
+
+Supabase → SQL Editor → pegar TODO → Run:
+
+```sql
+-- Cuaderno de intentos (solo lo ve/borra el sistema)
+create table if not exists public.envios_intentos (
+  id bigint generated always as identity primary key,
+  tipo text not null,
+  ip text not null default '',
+  creado_en timestamptz not null default now()
+);
+alter table public.envios_intentos enable row level security;
+
+-- La IP de quien envía (la pone la infraestructura en la cabecera)
+create or replace function public.ip_peticion()
+returns text language plpgsql stable set search_path to 'public' as $$
+declare v_cab text; v_ip text;
+begin
+  begin
+    v_cab := current_setting('request.headers', true);
+  exception when others then return ''; end;
+  if v_cab is null or v_cab = '' then return ''; end if;
+  v_ip := split_part(coalesce(v_cab::json ->> 'x-forwarded-for', ''), ',', 1);
+  return left(btrim(coalesce(v_ip, '')), 60);
+exception when others then return '';
+end; $$;
+
+-- El freno: tope por IP y hora + detector de galimatías (nombre Y
+-- mensaje de una sola palabra alfanumérica larga = bot). Ante cualquier
+-- fallo interno, deja pasar.
+create or replace function public.frenar_spam_form()
+returns trigger language plpgsql security definer
+set search_path to 'public' as $$
+declare
+  v_tipo text := TG_ARGV[0];
+  v_tope int  := coalesce(nullif(TG_ARGV[1], '')::int, 5);
+  v_ip text; v_n int;
+  v_nombre text; v_texto text;
+begin
+  begin
+    -- 1) Galimatías (solo el formulario de contacto)
+    if v_tipo = 'contacto' then
+      v_nombre := coalesce(NEW.nombre, '');
+      v_texto  := coalesce(NEW.mensaje, '');
+      if v_nombre !~ '\s' and v_nombre ~ '^[A-Za-z0-9]{8,}$'
+         and v_texto !~ '\s' and v_texto ~ '^[A-Za-z0-9]{8,}$' then
+        raise exception 'No hemos podido enviar el mensaje. Escríbenos a itakadyr@gmail.com o llámanos.'
+          using errcode = 'P0001';
+      end if;
+    end if;
+
+    -- 2) Tope por IP y hora
+    delete from public.envios_intentos where creado_en < now() - interval '1 day';
+    v_ip := public.ip_peticion();
+    if v_ip is null or v_ip = '' then return NEW; end if;
+    select count(*) into v_n from public.envios_intentos
+     where tipo = v_tipo and ip = v_ip
+       and creado_en > now() - interval '1 hour';
+    if v_n >= v_tope then
+      raise exception 'Demasiados envíos seguidos. Prueba en un rato, o llámanos al 604 93 59 85.'
+        using errcode = 'P0001';
+    end if;
+    insert into public.envios_intentos (tipo, ip) values (v_tipo, v_ip);
+  exception when others then
+    if SQLSTATE = 'P0001' then raise; end if;
+    return NEW;
+  end;
+  return NEW;
+end; $$;
+
+-- Contacto: máximo 5 por IP y hora, y sin galimatías
+drop trigger if exists trg_frenar_spam_mensajes on public.mensajes;
+create trigger trg_frenar_spam_mensajes
+  before insert on public.mensajes
+  for each row execute function public.frenar_spam_form('contacto', '5');
+
+-- Lista de espera: máximo 10 por IP y hora
+drop trigger if exists trg_frenar_spam_interesados on public.interesados;
+create trigger trg_frenar_spam_interesados
+  before insert on public.interesados
+  for each row execute function public.frenar_spam_form('espera', '10');
+```

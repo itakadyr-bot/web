@@ -125,6 +125,13 @@
       var aviso = document.getElementById('form-aviso');
       var boton = form.querySelector('button[type="submit"]');
       var datos = new FormData(form);
+      /* La trampa para robots: si el campo invisible viene relleno,
+         es un bot. Se le enseña el «enviado» de mentira y a otra cosa. */
+      if ((datos.get('website') || '').trim() !== '') {
+        boton.disabled = true;
+        boton.textContent = '¡Mensaje enviado!';
+        return;
+      }
       boton.disabled = true;
       if (aviso) { aviso.style.color = '#8494a4'; aviso.textContent = 'Enviando…'; }
 

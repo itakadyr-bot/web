@@ -74,6 +74,9 @@
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:44px;align-items:start">
 
     <form id="form-contacto" style="display:flex;flex-direction:column;gap:14px;background:#fff;border:1px solid #e9edf1;border-radius:24px;padding:clamp(24px,3.5vw,38px)">
+      <!-- Trampa para robots: las personas no ven este campo; los bots lo rellenan. -->
+      <div style="position:absolute;left:-6000px;top:-6000px" aria-hidden="true"><label>No rellenes esto si eres humano: <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+
       <label style="display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:700;color:#3b4a5c">Nombre y apellidos
         <input name="nombre" required="required" placeholder="María García" style="border:1px solid #d8dee4;border-radius:8px;padding:14px 15px;font:500 16px Barlow,sans-serif;color:#14202e" />
       </label>
