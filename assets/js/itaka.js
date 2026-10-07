@@ -70,6 +70,33 @@
     });
   });
 
+  /* --- Las opiniones, solo cuando son de verdad ---------------
+     La sección nace con [hidden]. Se enseña únicamente cuando las
+     reseñas ya no son el texto de plantilla (es decir, cuando se
+     pegaron reseñas reales en modo fantasma). Cada tarjeta que siga
+     siendo plantilla se queda escondida; si ninguna es real, la
+     sección entera no existe para el público. */
+  var opiniones = document.getElementById('opiniones');
+  if (opiniones) {
+    var esPlantilla = function (t) {
+      return /^(Aquí va|Y una tercera|Nombre de quien opina)/.test((t || '').trim());
+    };
+    var revisaOpiniones = function () {
+      if (document.body.classList.contains('editando')) { opiniones.hidden = false; return; }
+      var alguna = false;
+      opiniones.querySelectorAll('figure').forEach(function (fig) {
+        var cita = fig.querySelector('blockquote');
+        var real = cita && !esPlantilla(cita.textContent);
+        fig.hidden = !real;
+        if (real) alguna = true;
+      });
+      opiniones.hidden = !alguna;
+    };
+    /* se mira dos veces: tras aplicar la caché y tras la vuelta de la red */
+    setTimeout(revisaOpiniones, 900);
+    setTimeout(revisaOpiniones, 3200);
+  }
+
   /* --- La barra sobre el héroe -------------------------------
      En las páginas con foto arriba, la cabecera va transparente
      y se vuelve de cristal oscuro al bajar. */
@@ -175,7 +202,7 @@
         if (aviso) {
           aviso.style.color = '#b45309';
           aviso.textContent = 'No se pudo enviar ahora mismo. Escríbenos a ' +
-            'itakadyr@gmail.com o llámanos y te atendemos igual.';
+            'info@itakarecreacion.com o llámanos y te atendemos igual.';
         }
       });
     });

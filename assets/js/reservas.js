@@ -144,7 +144,7 @@
       }).catch(function () {
         botonEspera.disabled = false;
         avisoEspera.style.color = '#b45309';
-        avisoEspera.textContent = 'No se pudo apuntar ahora mismo. Escríbenos a itakadyr@gmail.com y te avisamos igual.';
+        avisoEspera.textContent = 'No se pudo apuntar ahora mismo. Escríbenos a info@itakarecreacion.com y te avisamos igual.';
       });
     });
   }

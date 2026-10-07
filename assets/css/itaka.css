@@ -13,6 +13,10 @@
    le gana al atributo y p. ej. el formulario de reserva seguía
    a la vista con las inscripciones cerradas). */
 [hidden] { display: none !important; }
+/* En modo edición, la sección de opiniones (que nace escondida hasta
+   tener reseñas reales) se enseña para poder pegarlas. */
+body.editando #opiniones[hidden] { display: block !important; }
+body.editando #opiniones figure[hidden] { display: flex !important; }
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
