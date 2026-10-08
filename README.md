@@ -14,7 +14,11 @@ gestión. Todo conectado y en producción.
 | `/campamentos/` | fichas de Riópar, Palancares y Alcossebre, cómo funciona la inscripción y FAQ |
 | `/campamentos/<x>/reserva/` | ficha de inscripción completa + pago de la señal |
 | `/campus/` | campus de verano |
-| `/servicios/` | escuelas, campus, fiestas, eventos, excursiones y alquiler |
+| `/servicios/` | escuelas, campus, celebraciones, eventos, excursiones y alquiler |
+| `/extraescolares/` | extraescolares deportivas para familias, AMPAs y coles |
+| `/instituciones/` | servicios para ayuntamientos, colegios y AMPAs, con referencias |
+| `/mayores/` | actividad física para mayores y programas municipales |
+| `/celebraciones/` | animación infantil para bodas, bautizos, comuniones y eventos |
 | `/nosotros/` | equipo, cómo trabajamos, garantías LOPIVI, números |
 | `/contacto/` | formulario de consulta + teléfonos y correo |
 | `/legal/` | aviso legal, privacidad, cookies y protección del menor |
