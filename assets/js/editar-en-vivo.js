@@ -129,6 +129,9 @@
       var img = laFotoDe(e.target);
       if (!img) return;
       var pos = getComputedStyle(img).objectPosition.split(' ');
+      if ((img.currentSrc || img.src || '').indexOf('data:image/svg') === 0) {
+        aviso.textContent = 'Este hueco aún lleva el dibujo de relleno: toca la pastilla 📷 y sube la foto; después ya podrás encuadrarla.';
+      }
       arrastre = {
         el: img, x0: e.clientX, y0: e.clientY,
         px: parseFloat(pos[0]) || 50, py: parseFloat(pos[1]) || 50,
@@ -216,10 +219,42 @@
     if (!objetivo || !objetivo.closest) return null;
     var mango = objetivo.closest('.fantasma-mango');
     if (mango) return mango._foto;
-    return objetivo.closest('[data-edit-img]');
+    var directa = objetivo.closest('[data-edit-img]');
+    if (directa) return directa;
+    /* El fondo de un héroe también vale: si el toque cae dentro de una
+       sección con foto de fondo y NO es sobre un texto editable, un
+       enlace o un botón, se encuadra esa foto. */
+    if (objetivo.closest('[data-edit], a, button, input, textarea, select, label, .fantasma-barra')) return null;
+    var seccion = objetivo.closest('section');
+    if (!seccion) return null;
+    var fondo = seccion.querySelector('[data-edit-img]');
+    if (fondo && getComputedStyle(fondo).position === 'absolute') return fondo;
+    return null;
   }
 
   function pintaMangos() {
+    var faltan = false;
+    document.querySelectorAll('[data-edit-img]').forEach(function (img) {
+      if (getComputedStyle(img).position !== 'absolute') return;
+      var caja = img.getBoundingClientRect();
+      if (!caja.width) { faltan = true; return; }
+      var mango = document.createElement('div');
+      mango.className = 'fantasma-mango';
+      mango.textContent = '📷 Foto del fondo';
+      mango.title = 'Toca para cambiarla · arrastra para encuadrar · rueda para zoom';
+      mango.style.left = (caja.right + scrollX - 16) + 'px';
+      mango.style.top = (caja.top + scrollY + 16) + 'px';
+      mango._foto = img;
+      document.body.appendChild(mango);
+      mangos.push(mango);
+    });
+    /* alguna foto aún medía cero: otro intento cuando asiente */
+    if (faltan) setTimeout(function () {
+      if (editando) { quitaMangos(); pintaMangosSinReintento(); }
+    }, 700);
+  }
+
+  function pintaMangosSinReintento() {
     document.querySelectorAll('[data-edit-img]').forEach(function (img) {
       if (getComputedStyle(img).position !== 'absolute') return;
       var caja = img.getBoundingClientRect();
